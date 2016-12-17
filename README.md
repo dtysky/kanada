@@ -1,2 +1,2 @@
 # kanada
-Opencv port to Javascript.
+Port opencv to Javascript.

@@ -1,0 +1,23 @@
+{
+  "name": "kanada",
+  "version": "0.0.1",
+  "description": "Port opencv to Javascript.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dtysky/kanada.git"
+  },
+  "keywords": [
+    "image processing",
+    "kanada"
+  ],
+  "author": "dtysky",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dtysky/kanada/issues"
+  },
+  "homepage": "https://github.com/dtysky/kanada#readme"
+}
