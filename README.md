@@ -1,2 +1,2 @@
-# kanada
+# kanata
 Port opencv to Javascript.

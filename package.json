@@ -1,5 +1,5 @@
 {
-  "name": "kanada",
+  "name": "kanata",
   "version": "0.0.1",
   "description": "Port opencv to Javascript.",
   "main": "index.js",
@@ -8,16 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dtysky/kanada.git"
+    "url": "git+https://github.com/dtysky/kanata.git"
   },
   "keywords": [
     "image processing",
-    "kanada"
+    "kanata"
   ],
   "author": "dtysky",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dtysky/kanada/issues"
+    "url": "https://github.com/dtysky/kanata/issues"
   },
-  "homepage": "https://github.com/dtysky/kanada#readme"
+  "homepage": "https://github.com/dtysky/kanata#readme"
 }
