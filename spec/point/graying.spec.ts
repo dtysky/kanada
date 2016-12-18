@@ -4,7 +4,7 @@
  * Description:
  */
 
-import {test} from '../src/test';
+import {test} from '../../src/point/graying';
 
 describe('test', () => {
     it('should say "Hello world!"', () => {

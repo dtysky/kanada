@@ -4,6 +4,7 @@
   "description": "Port opencv to Javascript.",
   "main": "index.js",
   "scripts": {
+    "init-project": "bash ./init.sh",
     "dev": "./node_modules/.bin/webpack --config webpack.dev.config.js",
     "test": "./node_modules/.bin/karma start karma.conf.js"
   },
