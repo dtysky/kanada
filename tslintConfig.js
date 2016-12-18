@@ -10,7 +10,7 @@ const fs = require('fs');
 module.exports = {
   configuration: {
     rulesDirectory: 'node_modules/tslint-microsoft-contrib',
-    configuration: JSON.parse(fs.readSync('./tslint.json'))
+    configuration: JSON.parse(fs.readSync('tslint.json'))
   },
 
   // enables type checked rules like 'for-in-array'
