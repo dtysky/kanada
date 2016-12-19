@@ -4,11 +4,11 @@
  * Description: graying a image.
  */
 
-import {ImageCore} from '../core/index';
-import {Errors} from '../core/index';
+import {TColorSpaces, Environments} from '../constants/index';
+import {Exceptions, ImageCore} from '../core/index';
 
 export function graying(image: ImageCore) {
-    if (image.mode() !== 'RGB' || image.mode() !== 'RGBA') {
-        throw new Errors.ImageModeError(image.mode(), 'RGB or RGBA');
+    if (image.mode !== <TColorSpaces>'RGB' || image.mode !== <TColorSpaces>'RGBA') {
+        throw new Exceptions.ImageModeError(image.mode, 'RGB', 'RGBA');
     }
 }

@@ -23,7 +23,9 @@
   },
   "homepage": "https://github.com/dtysky/kanata#readme",
   "devDependencies": {
+    "@types/es6-shim": "^0.31.32",
     "@types/jasmine": "^2.5.38",
+    "@types/node": "^6.0.52",
     "awesome-typescript-loader": "^3.0.0-beta.17",
     "extract-text-webpack-plugin": "^1.0.1",
     "gulp": "^3.9.1",

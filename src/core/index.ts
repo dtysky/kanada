@@ -4,8 +4,5 @@
  * Description: core members.
  */
 
-export namespace Errors {
-    export * from './errors';
-}
-
-export * from './ImageCore';
+export * from './exceptions';
+export * from './imageCore';
