@@ -4,23 +4,13 @@
  * Description:
  */
 
-//export enum ColorSpaces {
-//    'RGB',
-//    'RGBA',
-//    'L',
-//    'B',
-//    'CMYK',
-//    'HLS',
-//    'HSV',
-//    'XYZ'
-//}
-
-export type TColorSpaces =
-    'RGBA'
-    | 'RGB'
-    | 'L'
-    | 'B'
-    | 'CMYK'
-    | 'HLS'
-    | 'HSV'
-    | 'XYZ';
+export enum EColorSpaces {
+    'RGB',
+    'RGBA',
+    'L',
+    'B',
+    'CMYK',
+    'HLS',
+    'HSV',
+    'XYZ'
+}

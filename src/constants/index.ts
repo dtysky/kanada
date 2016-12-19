@@ -4,5 +4,6 @@
  * Description: constants for this project.
  */
 
+export * from './types';
 export * from './color';
 export * from './environments';

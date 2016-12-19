@@ -30,4 +30,13 @@ export namespace Exceptions {
             super('InvalidImagePathError', `Image which has path '${path}' is invalid, check your url !`);
         }
     }
+
+    export class BufferSizeError extends BaseError {
+        constructor(currentSize: number, expectedSize: number) {
+            super(
+                'BufferSizeError',
+                `Buffer's size is error, expect '${expectedSize}' but current is '${currentSize}'.`
+            );
+        }
+    }
 }

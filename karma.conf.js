@@ -13,7 +13,7 @@ module.exports = function(config) {
 
     files: [
       {pattern: 'src/**/*.ts'},
-      {pattern: 'spec/**/*.spec.ts'},
+      {pattern: 'spec/**/*.ts'},
       {pattern: './testImages/**/*', included: false}
     ],
 

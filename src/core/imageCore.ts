@@ -4,7 +4,7 @@
  * Description: core data structure for image.
  */
 
-import {TColorSpaces, Environments} from '../constants/index';
+import {TColorSpaces, TImageSize, Environments} from '../constants/index';
 import {Exceptions} from './exceptions';
 
 export class ImageCore {
@@ -20,23 +20,23 @@ export class ImageCore {
         this.data = new Uint8ClampedArray([]);
     }
 
-    private getDataInNode(url: string) : Promise<ImageCore> {
-        return new Promise((resolve, reject) => resolve());
+    public fromImage(image: HTMLImageElement): ImageCore {
+        const canvas = document.createElement('canvas');
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const context = canvas.getContext('2d');
+        context.drawImage(image, 0, 0, image.width, image.height);
+        this._width = image.width;
+        this._height = image.height;
+        this.data = context.getImageData(0, 0, image.width, image.height).data;
+        return this;
     }
 
     private getDataInBrowser(url: string) : Promise<ImageCore> {
         return new Promise((resolve, reject) => {
             const image = new Image();
             image.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = image.width;
-                canvas.height = image.height;
-                const context = canvas.getContext('2d');
-                context.drawImage(image, 0, 0, image.width, image.height);
-                this._width = image.width;
-                this._height = image.height;
-                this.data = context.getImageData(0, 0, image.width, image.height).data;
-                resolve(this);
+                resolve(this.fromImage(image));
             };
             image.onerror = () => {
                 this._width = 0;
@@ -46,6 +46,10 @@ export class ImageCore {
             };
             image.src = url;
         });
+    }
+
+    private getDataInNode(url: string) : Promise<ImageCore> {
+        return new Promise((resolve, reject) => resolve());
     }
 
     public fromUrl(url: string): Promise<ImageCore> {
@@ -59,18 +63,13 @@ export class ImageCore {
             : this.getDataInNode(url);
     }
 
-    public fromImage(image: HTMLImageElement): ImageCore {
-        return this;
-    }
-
-    public fromBuffer(buffer: Uint8ClampedArray): ImageCore {
-        return this;
-    }
-
     public copy(image: ImageCore): ImageCore {
         if (image._mode !== this._mode) {
             throw new Exceptions.ImageModeError(image._mode, this._mode);
         }
+        this._width = image._width;
+        this._height = image._height;
+        this.data = image.data;
         return this;
     }
 
@@ -78,7 +77,7 @@ export class ImageCore {
         return this._mode;
     }
 
-    public get size(): {width: number, height: number} {
+    public get size(): TImageSize {
         return {width: this._width, height: this._height};
     }
 
