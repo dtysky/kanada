@@ -7,13 +7,14 @@
 module.exports = function(config) {
   config.set({
 
-    basePath: '.',
+    basePath: '',
 
     frameworks: ['jasmine', 'karma-typescript'],
 
     files: [
       {pattern: 'src/**/*.ts'},
-      {pattern: 'spec/**/*.spec.ts'}
+      {pattern: 'spec/**/*.spec.ts'},
+      {pattern: './testImages/**/*', included: false}
     ],
 
     port: 9876,

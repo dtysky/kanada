@@ -8,10 +8,9 @@ import {TColorSpaces} from '../constants/index';
 
 export namespace Exceptions {
     class BaseError extends Error {
-        constructor(public message: string) {
+        constructor(name: string = 'BaseError', message: string) {
             super();
-            // tslint:disable-next-line
-            this.name = (<any>this).constructor.name;
+            this.name = name;
             this.stack = (new Error()).stack;
             this.message = message;
         }
@@ -19,13 +18,16 @@ export namespace Exceptions {
 
     export class ImageModeError extends BaseError {
         constructor(currentMode: TColorSpaces, ...expectedModes: TColorSpaces[]) {
-            super(`Image's mode is error, expect '${expectedModes.join(' or ')}' but current is '${currentMode}'.`);
+            super(
+                'ImageModeError',
+                `Image's mode is error, expect '${expectedModes.join(' or ')}' but current is '${currentMode}'.`
+            );
         }
     }
 
     export class InvalidImagePathError extends BaseError {
         constructor(path: string) {
-            super(`Image which has path ${path} is invalid, check your url !`);
+            super('InvalidImagePathError', `Image which has path '${path}' is invalid, check your url !`);
         }
     }
 }

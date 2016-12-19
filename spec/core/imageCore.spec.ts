@@ -16,10 +16,30 @@ describe('ImageCore', () => {
         expect(image.mode).toEqual('L');
     });
 
-    describe('fromUrl, getting image data from url: ', () => {
-        it ('error with type', () => {
+    fdescribe('fromUrl, getting image data from url:', () => {
+        it ('failed with type', done => {
             const image = new ImageCore('L');
-            expect(image.fromUrl('')).toThrow(new Exceptions.ImageModeError('L', 'RGB', 'RGBA'));
+            image.fromUrl('')
+                .catch(err => {
+                    expect(err.name).toEqual('ImageModeError');
+                    done();
+                });
+        });
+        it ('failed with path', done => {
+            const image = new ImageCore();
+            image.fromUrl('')
+                .catch(err => {
+                    expect(err.name).toEqual('InvalidImagePathError');
+                    done();
+                });
+        });
+        it('successful', done => {
+            const image = new ImageCore();
+            image.fromUrl('/base/testImages/rgba.png')
+                .then(img => {
+                    expect(img.size).toEqual({width: 800, height: 800});
+                    done();
+                });
         });
     });
 

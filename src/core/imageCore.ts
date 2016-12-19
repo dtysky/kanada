@@ -20,11 +20,11 @@ export class ImageCore {
         this.data = new Uint8ClampedArray([]);
     }
 
-    private getDataInNode(url: string) : Promise<ImageCore | Exceptions.InvalidImagePathError> {
+    private getDataInNode(url: string) : Promise<ImageCore> {
         return new Promise((resolve, reject) => resolve());
     }
 
-    private getDataInBrowser(url: string) : Promise<ImageCore | Exceptions.InvalidImagePathError> {
+    private getDataInBrowser(url: string) : Promise<ImageCore> {
         return new Promise((resolve, reject) => {
             const image = new Image();
             image.onload = () => {
@@ -48,9 +48,11 @@ export class ImageCore {
         });
     }
 
-    public fromUrl(url: string): Promise<ImageCore | Exceptions.InvalidImagePathError> {
-        if (this._mode !== <TColorSpaces>'RGBA' || this._mode !== <TColorSpaces>'RGB') {
-            throw new Exceptions.ImageModeError(this._mode, 'RGB', 'RGBA');
+    public fromUrl(url: string): Promise<ImageCore> {
+        if (this._mode !== <TColorSpaces>'RGBA' && this._mode !== <TColorSpaces>'RGB') {
+            return new Promise((resolve, reject) =>
+                reject(new Exceptions.ImageModeError(this._mode, 'RGB', 'RGBA'))
+            );
         }
         return Environments.BROWSER_MODE
             ? this.getDataInBrowser(url)
