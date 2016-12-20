@@ -83,6 +83,12 @@ describe('ImageCore', () => {
         });
     });
 
+    it('changeMode, change mode of image:', () => {
+        const image = new ImageCore();
+        image.changeMode('L');
+        expect(image.mode).toEqual('L');
+    });
+
     it('setPixel and getPixel, setting or getting pixel in image with position:', done => {
         const image = new ImageCore();
         const url = '/base/testImages/white.png';
@@ -122,7 +128,7 @@ describe('ImageCore', () => {
                 let x = 0;
                 let y = 0;
                 img.map(point => {
-                    const [position,] = point;
+                    const [position] = point;
                     expect([x, y]).toEqual(position);
                     y = x === 19 ? y + 1 : y;
                     x = x === 19 ? 0 : x + 1;
@@ -131,5 +137,21 @@ describe('ImageCore', () => {
                 expect(img.data).toEqual(black20x20);
                 done();
             });
+    });
+
+    describe('test for performance:', () => {
+        fit ('map', done => {
+            const image = new ImageCore();
+            const url = '/base/testImages/rgba.png';
+            image.fromUrl(url)
+                .then(img => {
+                    // img.changeMode('L');
+                    const s = performance.now();
+                    img.map(point => [0, 0, 0, 255]);
+                    // img.map(point => [0]);
+                    console.log('Performance: size - ', img.size, 'time - ', (performance.now() - s));
+                    done();
+                });
+        });
     });
 });

@@ -4,16 +4,24 @@
  * Description: types definitions.
  */
 
+/**
+ * Type of color spaces.
+ */
 export type TColorSpaces =
     'RGBA'
-        | 'RGB'
-        | 'L'
-        | 'B'
-        | 'CMYK'
-        | 'HLS'
-        | 'HSV'
-        | 'XYZ';
+    | 'RGB'
+    | 'BGR'
+    | 'BGRA'
+    | 'L'
+    | 'B'
+    | 'CMYK'
+    | 'HLS'
+    | 'HSV'
+    | 'XYZ';
 
+/**
+ * Type of image's size.
+ */
 export type TImageSize = {
     width: number,
     height: number

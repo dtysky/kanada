@@ -4,7 +4,7 @@
  * Description: Tests for exceptions.
  */
 
-import {Exceptions} from '../../src/core/index';
+import {Exceptions} from '../../src/core';
 
 describe('Exceptions', () => {
     it('ImageModeError', () => {

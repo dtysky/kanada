@@ -64,7 +64,7 @@ export class ImageCore {
     }
 
     public fromUrl(url: string): Promise<ImageCore> {
-        if (this._mode !== 'RGBA' && this._mode !== 'RGB') {
+        if (this._mode !== 'RGBA' && this._mode !== 'RGB' && this._mode !== 'BGR' && this._mode !== 'BGRA') {
             return new Promise((resolve, reject) =>
                 reject(new Exceptions.ImageModeError(this._mode, 'RGB', 'RGBA'))
             );
@@ -84,6 +84,10 @@ export class ImageCore {
         return this;
     }
 
+    public changeMode(mode: TColorSpaces) {
+        this._mode = mode;
+    }
+
     public setPixel(position: TCoords, pixel: TPixel): ImageCore {
         const start = (this._width * position[1] + position[0]) * PIXEL_SIZE[this._mode];
         this.data.set(new Uint8ClampedArray(pixel), start);
@@ -99,15 +103,29 @@ export class ImageCore {
         pointOption: (point: TPoint) => TPixel | void,
         modify: boolean = false
     ) : void {
-        for (let y = 0; y < this._height; y += 1) {
-            for (let x = 0; x < this._width; x += 1) {
-                const position: TCoords = [x, y];
-                if (modify) {
-                    this.setPixel(position, <TPixel>pointOption([position, this.getPixel(position)]));
-                } else {
-                    pointOption([position, this.getPixel(position)]);
+        const size = this._width * this._height * PIXEL_SIZE[this._mode];
+        const rowSize = this._width - 1;
+        let x = 0;
+        let y = 0;
+        for (let pos = 0; pos < size; pos += 4) {
+            const position: TCoords = [x, y];
+            if (modify) {
+                switch (PIXEL_SIZE[this._mode]) {
+                    case 1:
+                        this.data[pos] = (<TPixel>pointOption([position, [this.data[pos]]]))[0];
+                        continue;
+                    default:
+                        this.data.set(
+                            pointOption([position, this.data.subarray(pos, pos + PIXEL_SIZE[this._mode])]),
+                            pos
+                        );
+                        continue;
                 }
+            } else {
+                pointOption([position, this.data.subarray(pos, pos + PIXEL_SIZE[this._mode])]);
             }
+            y = x === rowSize ? y + 1 : y;
+            x = x === rowSize ? 0 : x + 1;
         }
     }
 
