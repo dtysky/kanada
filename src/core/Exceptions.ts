@@ -4,7 +4,7 @@
  * Description: a set of errors.
  */
 
-import {TColorSpaces} from '../constants/index';
+import {TColorSpaces} from '../constants';
 
 export namespace Exceptions {
     class BaseError extends Error {

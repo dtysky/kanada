@@ -4,7 +4,10 @@
  * Description: core data structure for image.
  */
 
-import {TColorSpaces, TImageSize, Environments} from '../constants/index';
+import {
+    TColorSpaces, TImageSize, TPixel, TPoint, TCoords,
+    PIXEL_SIZE, Environments
+} from '../constants';
 import {Exceptions} from './exceptions';
 
 export class ImageCore {
@@ -20,6 +23,14 @@ export class ImageCore {
         this.data = new Uint8ClampedArray([]);
     }
 
+    public get mode(): TColorSpaces {
+        return this._mode;
+    }
+
+    public get size(): TImageSize {
+        return {width: this._width, height: this._height};
+    }
+
     public fromImage(image: HTMLImageElement): ImageCore {
         const canvas = document.createElement('canvas');
         canvas.width = image.width;
@@ -32,7 +43,7 @@ export class ImageCore {
         return this;
     }
 
-    private getDataInBrowser(url: string) : Promise<ImageCore> {
+    private _getDataInBrowser(url: string) : Promise<ImageCore> {
         return new Promise((resolve, reject) => {
             const image = new Image();
             image.onload = () => {
@@ -48,19 +59,19 @@ export class ImageCore {
         });
     }
 
-    private getDataInNode(url: string) : Promise<ImageCore> {
+    private _getDataInNode(url: string) : Promise<ImageCore> {
         return new Promise((resolve, reject) => resolve());
     }
 
     public fromUrl(url: string): Promise<ImageCore> {
-        if (this._mode !== <TColorSpaces>'RGBA' && this._mode !== <TColorSpaces>'RGB') {
+        if (this._mode !== 'RGBA' && this._mode !== 'RGB') {
             return new Promise((resolve, reject) =>
                 reject(new Exceptions.ImageModeError(this._mode, 'RGB', 'RGBA'))
             );
         }
         return Environments.BROWSER_MODE
-            ? this.getDataInBrowser(url)
-            : this.getDataInNode(url);
+            ? this._getDataInBrowser(url)
+            : this._getDataInNode(url);
     }
 
     public copy(image: ImageCore): ImageCore {
@@ -73,29 +84,39 @@ export class ImageCore {
         return this;
     }
 
-    public get mode(): TColorSpaces {
-        return this._mode;
+    public setPixel(position: TCoords, pixel: TPixel): ImageCore {
+        const start = (this._width * position[1] + position[0]) * PIXEL_SIZE[this._mode];
+        this.data.set(new Uint8ClampedArray(pixel), start);
+        return this;
     }
 
-    public get size(): TImageSize {
-        return {width: this._width, height: this._height};
+    public getPixel(position: TCoords): TPixel {
+        const start = (this._width * position[1] + position[0]) * PIXEL_SIZE[this._mode];
+        return this.data.subarray(start, start + PIXEL_SIZE[this._mode]);
     }
 
-    private loopWithPoints(
-        pointOption: (point: [number]) => number[] | void,
+    private _loopWithPoints(
+        pointOption: (point: TPoint) => TPixel | void,
         modify: boolean = false
     ) : void {
-        switch (this.mode) {
-            default:
-                return;
+        for (let y = 0; y < this._height; y += 1) {
+            for (let x = 0; x < this._width; x += 1) {
+                const position: TCoords = [x, y];
+                if (modify) {
+                    this.setPixel(position, <TPixel>pointOption([position, this.getPixel(position)]));
+                } else {
+                    pointOption([position, this.getPixel(position)]);
+                }
+            }
         }
     }
 
-    public map(pointOption: (point: number[]) => number[]) : void {
-        this.loopWithPoints(pointOption, true);
+    public map(pointOption: (point: TPoint) => TPixel) : ImageCore {
+        this._loopWithPoints(pointOption, true);
+        return this;
     }
 
-    public forEach(pointOption: (point: number[]) => void) : void {
-        this.loopWithPoints(pointOption);
+    public forEach(pointOption: (point: TPoint) => void) : void {
+        this._loopWithPoints(pointOption);
     }
 }

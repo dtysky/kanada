@@ -34,7 +34,7 @@
     "no-any": true,
     "no-arg": true,
     "no-backbone-get-set-outside-model": true,
-    "no-bitwise": true,
+//    "no-bitwise": true,
     "no-conditional-assignment": true,
     "no-console": [
       true,
@@ -143,7 +143,10 @@
       "memberVariableDeclarator"
     ],
     "underscore-consistent-invocation": true,
-    "variable-name": true,
+    "variable-name": [
+      true,
+      "allow-leading-underscore"
+    ],
     "react-a11y-anchors": true,
     "react-a11y-aria-unsupported-elements": true,
     "react-a11y-event-has-role": true,

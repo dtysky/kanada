@@ -2,8 +2,6 @@
 .idea
 .DS_Store
 node_modules
-spec/*.png
-spec/*.bmp
-spec/*.jpg
+testImages
 *.log
 reports

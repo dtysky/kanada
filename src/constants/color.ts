@@ -14,3 +14,14 @@ export enum EColorSpaces {
     'HSV',
     'XYZ'
 }
+
+export const PIXEL_SIZE = {
+    RGB: 3,
+    RGBA: 4,
+    L: 1,
+    B: 1,
+    CMYK: 3,
+    HLS: 3,
+    HSV: 3,
+    XYZ: 3
+};
