@@ -12,15 +12,16 @@ import {Exceptions} from './exceptions';
 
 export class ImageCore {
     private _mode: TColorSpaces;
-    private _width: number;
-    private _height: number;
-    public data: Uint8ClampedArray;
+    private _context: CanvasRenderingContext2D;
+    private _data: ImageData;
+    // a flag for push back data to context lazily
+    public dataIsModified: boolean;
 
     constructor(mode: TColorSpaces = <TColorSpaces>'RGBA') {
         this._mode = mode;
-        this._width = 0;
-        this._height = 0;
-        this.data = new Uint8ClampedArray([]);
+        this._context = document.createElement('canvas').getContext('2d');
+        this._data = new ImageData(1, 1);
+        this.dataIsModified = false;
     }
 
     public get mode(): TColorSpaces {
@@ -28,7 +29,11 @@ export class ImageCore {
     }
 
     public get size(): TImageSize {
-        return {width: this._width, height: this._height};
+        return {width: this._data.width, height: this._data.height};
+    }
+
+    public get data(): Uint8ClampedArray {
+        return this._data.data;
     }
 
     public fromImage(image: HTMLImageElement): ImageCore {
@@ -37,9 +42,8 @@ export class ImageCore {
         canvas.height = image.height;
         const context = canvas.getContext('2d');
         context.drawImage(image, 0, 0, image.width, image.height);
-        this._width = image.width;
-        this._height = image.height;
-        this.data = context.getImageData(0, 0, image.width, image.height).data;
+        this._context = context;
+        this._data = context.getImageData(0, 0, image.width, image.height);
         return this;
     }
 
@@ -50,9 +54,7 @@ export class ImageCore {
                 resolve(this.fromImage(image));
             };
             image.onerror = () => {
-                this._width = 0;
-                this._height = 0;
-                this.data = new Uint8ClampedArray([]);
+                this._data = new ImageData(1, 1);
                 reject(new Exceptions.InvalidImagePathError(url));
             };
             image.src = url;
@@ -78,9 +80,9 @@ export class ImageCore {
         if (image._mode !== this._mode) {
             throw new Exceptions.ImageModeError(image._mode, this._mode);
         }
-        this._width = image._width;
-        this._height = image._height;
-        this.data = image.data;
+        this._data = image._data;
+        this._context = image._context;
+        this.dataIsModified = image.dataIsModified;
         return this;
     }
 
@@ -88,14 +90,24 @@ export class ImageCore {
         this._mode = mode;
     }
 
+    public modifyData(imageOption: (data: Uint8ClampedArray, size: TImageSize) => void) {
+        imageOption(this.data, this.size);
+        this.dataIsModified = true;
+    }
+
+    public pushDataToContext() {
+        this._context.putImageData(this._data, 0, 0);
+        this.dataIsModified = false;
+    }
+
     public setPixel(position: TCoords, pixel: TPixel): ImageCore {
-        const start = (this._width * position[1] + position[0]) * PIXEL_SIZE[this._mode];
+        const start = (this._data.width * position[1] + position[0]) * PIXEL_SIZE[this._mode];
         this.data.set(new Uint8ClampedArray(pixel), start);
         return this;
     }
 
     public getPixel(position: TCoords): TPixel {
-        const start = (this._width * position[1] + position[0]) * PIXEL_SIZE[this._mode];
+        const start = (this._data.width * position[1] + position[0]) * PIXEL_SIZE[this._mode];
         return this.data.subarray(start, start + PIXEL_SIZE[this._mode]);
     }
 
@@ -103,8 +115,8 @@ export class ImageCore {
         pointOption: (point: TPoint) => TPixel | void,
         modify: boolean = false
     ) : void {
-        const size = this._width * this._height * PIXEL_SIZE[this._mode];
-        const rowSize = this._width - 1;
+        const size = this.data.length;
+        const rowSize = this._data.width - 1;
         let x = 0;
         let y = 0;
         for (let pos = 0; pos < size; pos += 4) {
@@ -112,14 +124,15 @@ export class ImageCore {
             if (modify) {
                 switch (PIXEL_SIZE[this._mode]) {
                     case 1:
+                        // optimization for mode 'L' and 'B'
                         this.data[pos] = (<TPixel>pointOption([position, [this.data[pos]]]))[0];
-                        continue;
+                        break;
                     default:
                         this.data.set(
                             pointOption([position, this.data.subarray(pos, pos + PIXEL_SIZE[this._mode])]),
                             pos
                         );
-                        continue;
+                        break;
                 }
             } else {
                 pointOption([position, this.data.subarray(pos, pos + PIXEL_SIZE[this._mode])]);
@@ -131,6 +144,7 @@ export class ImageCore {
 
     public map(pointOption: (point: TPoint) => TPixel) : ImageCore {
         this._loopWithPoints(pointOption, true);
+        this.dataIsModified = true;
         return this;
     }
 

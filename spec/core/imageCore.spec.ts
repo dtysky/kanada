@@ -11,8 +11,9 @@ describe('ImageCore', () => {
     it('constructor, all member variables will be initialized', () => {
         let image = new ImageCore();
         expect(image.mode).toEqual('RGBA');
-        expect(image.size).toEqual({width: 0, height: 0});
+        expect(image.size).toEqual({width: 1, height: 1});
         expect(image.data).toEqual(new Uint8ClampedArray([]));
+        expect(image.dataIsModified).toBeFalsy();
         image = new ImageCore('L');
         expect(image.mode).toEqual('L');
     });
@@ -77,7 +78,9 @@ describe('ImageCore', () => {
                 .then(img => {
                     image2.copy(img);
                     expect(image2.size).toEqual(img.size);
-                    expect(img.data).toEqual(img.data);
+                    expect(image2.data).toEqual(img.data);
+                    expect(image2.mode).toEqual(img.mode);
+                    expect(image2.dataIsModified).toEqual(img.dataIsModified);
                     done();
                 });
         });
@@ -98,6 +101,26 @@ describe('ImageCore', () => {
                 img.setPixel([19, 19], [100, 100, 100, 1]);
                 expect(img.getPixel([0, 0])).toEqual(new Uint8ClampedArray([0, 0, 0, 1]));
                 expect(img.getPixel([19, 19])).toEqual(new Uint8ClampedArray([100, 100, 100, 1]));
+                done();
+            });
+    });
+
+    it('modifyData, modify data with given option:', done => {
+        const image = new ImageCore();
+        const url = '/base/testImages/white.png';
+        image.fromUrl(url)
+            .then(img => {
+                img.modifyData((data, size) => {
+                    expect(size).toEqual({width: 20, height: 20});
+                    for (let pos = 0; pos < data.length; pos += 4) {
+                        data[pos] = 0;
+                        data[pos + 1] = 0;
+                        data[pos + 2] = 0;
+                        data[pos + 3] = 255;
+                    }
+                });
+                expect(img.data).toEqual(black20x20);
+                expect(img.dataIsModified).toBeTruthy();
                 done();
             });
     });
@@ -135,21 +158,62 @@ describe('ImageCore', () => {
                     return [0, 0, 0, 255];
                 });
                 expect(img.data).toEqual(black20x20);
+                expect(img.dataIsModified).toBeTruthy();
                 done();
             });
     });
 
     describe('test for performance:', () => {
-        fit ('map', done => {
+        it('modifyData, modify data with given option:', done => {
             const image = new ImageCore();
             const url = '/base/testImages/rgba.png';
             image.fromUrl(url)
                 .then(img => {
-                    // img.changeMode('L');
                     const s = performance.now();
+                    img.modifyData((data, size) => {
+                        for (let pos = 0; pos < data.length; pos += 4) {
+                            data[pos] = 0;
+                            data[pos + 1] = 0;
+                            data[pos + 2] = 0;
+                            data[pos + 3] = 255;
+                        }
+                    });
+                    console.log('Performance, ImageCore, modifyData', img.size, img.mode, 'time(ms)', (performance.now() - s));
+                    done();
+                });
+        });
+        it ('forEach', done => {
+            const image = new ImageCore();
+            const url = '/base/testImages/rgba.png';
+            image.fromUrl(url)
+                .then(img => {
+                    let s = performance.now();
+                    img.forEach(() => []);
+                    // tslint:disable-next-line
+                    console.log('Performance, ImageCore, forEach', img.size, img.mode, 'time(ms)', (performance.now() - s));
+
+                    img.changeMode('L');
+                    s = performance.now();
+                    img.forEach(() => []);
+                    // tslint:disable-next-line
+                    console.log('Performance, ImageCore, forEach', img.size, img.mode, 'time(ms)', (performance.now() - s));
+                    done();
+                });
+        });
+        it ('map', done => {
+            const image = new ImageCore();
+            const url = '/base/testImages/rgba.png';
+            image.fromUrl(url)
+                .then(img => {
+                    let s = performance.now();
                     img.map(point => [0, 0, 0, 255]);
-                    // img.map(point => [0]);
-                    console.log('Performance: size - ', img.size, 'time - ', (performance.now() - s));
+                    // tslint:disable-next-line
+                    console.log('Performance, ImageCore, map', img.size, img.mode, 'time(ms)', (performance.now() - s));
+                    img.changeMode('L');
+                    s = performance.now();
+                    img.map(point => [0]);
+                    // tslint:disable-next-line
+                    console.log('Performance, ImageCore, map', img.size, img.mode, 'time(ms)', (performance.now() - s));
                     done();
                 });
         });
