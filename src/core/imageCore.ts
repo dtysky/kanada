@@ -5,7 +5,7 @@
  */
 
 import {
-    TColorSpaces, TImageSize, TPixel, TPoint, TCoords,
+    TColorSpaces, TImageSize, TPixel, TCoord, TPosition, TBuffer,
     PIXEL_SIZE, Environments
 } from '../constants';
 import {Exceptions} from './exceptions';
@@ -29,7 +29,7 @@ export class ImageCore {
     }
 
     public get size(): TImageSize {
-        return {width: this._data.width, height: this._data.height};
+        return [this._data.width, this._data.height];
     }
 
     public get data(): Uint8ClampedArray {
@@ -44,6 +44,21 @@ export class ImageCore {
         context.drawImage(image, 0, 0, image.width, image.height);
         this._context = context;
         this._data = context.getImageData(0, 0, image.width, image.height);
+        return this;
+    }
+
+    public fromBuffer(size: TImageSize, buffer: TBuffer): ImageCore {
+        if (size[0] * size[1] * 4 !== buffer.length) {
+            throw new Exceptions.BufferSizeError(buffer.length, size[0] * size[1] * 4);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = size[0];
+        canvas.height = size[1];
+        const context = canvas.getContext('2d');
+        this._data = context.getImageData(0, 0, canvas.width, canvas.height);
+        this._data.data.set(buffer, 0);
+        context.putImageData(this._data, 0, 0);
+        this._context = context;
         return this;
     }
 
@@ -90,29 +105,37 @@ export class ImageCore {
         this._mode = mode;
     }
 
+    public pushDataBackToContext() {
+        this._context.putImageData(this._data, 0, 0);
+        this.dataIsModified = false;
+    }
+
     public modifyData(imageOption: (data: Uint8ClampedArray, size: TImageSize) => void) {
         imageOption(this.data, this.size);
         this.dataIsModified = true;
     }
 
-    public pushDataToContext() {
-        this._context.putImageData(this._data, 0, 0);
-        this.dataIsModified = false;
+    public modifyContext(contextOption: (context: CanvasRenderingContext2D, size: TImageSize) => void) {
+        if (this.dataIsModified) {
+            this.pushDataBackToContext();
+        }
+        contextOption(this._context, this.size);
+        this._data = this._context.getImageData(0, 0, this.size[0], this.size[1]);
     }
 
-    public setPixel(position: TCoords, pixel: TPixel): ImageCore {
-        const start = (this._data.width * position[1] + position[0]) * PIXEL_SIZE[this._mode];
+    public setPixel(x: TCoord, y: TCoord, pixel: TPixel): ImageCore {
+        const start = (this._data.width * y + x) * PIXEL_SIZE[this._mode];
         this.data.set(new Uint8ClampedArray(pixel), start);
         return this;
     }
 
-    public getPixel(position: TCoords): TPixel {
-        const start = (this._data.width * position[1] + position[0]) * PIXEL_SIZE[this._mode];
+    public getPixel(x: TCoord, y: TCoord): TPixel {
+        const start = (this._data.width * y + x) * PIXEL_SIZE[this._mode];
         return this.data.subarray(start, start + PIXEL_SIZE[this._mode]);
     }
 
     private _loopWithPoints(
-        pointOption: (point: TPoint) => TPixel | void,
+        pointOption: (pixel: TPixel, position: TPosition) => TPixel | void,
         modify: boolean = false
     ) : void {
         const size = this.data.length;
@@ -120,35 +143,26 @@ export class ImageCore {
         let x = 0;
         let y = 0;
         for (let pos = 0; pos < size; pos += 4) {
-            const position: TCoords = [x, y];
             if (modify) {
-                switch (PIXEL_SIZE[this._mode]) {
-                    case 1:
-                        // optimization for mode 'L' and 'B'
-                        this.data[pos] = (<TPixel>pointOption([position, [this.data[pos]]]))[0];
-                        break;
-                    default:
-                        this.data.set(
-                            pointOption([position, this.data.subarray(pos, pos + PIXEL_SIZE[this._mode])]),
-                            pos
-                        );
-                        break;
-                }
+                this.data.set(
+                    pointOption(this.data.subarray(pos, pos + PIXEL_SIZE[this._mode]), [x, y]),
+                    pos
+                );
             } else {
-                pointOption([position, this.data.subarray(pos, pos + PIXEL_SIZE[this._mode])]);
+                pointOption(this.data.subarray(pos, pos + PIXEL_SIZE[this._mode]), [x, y])
             }
             y = x === rowSize ? y + 1 : y;
             x = x === rowSize ? 0 : x + 1;
         }
     }
 
-    public map(pointOption: (point: TPoint) => TPixel) : ImageCore {
+    public map(pointOption: (pixel: TPixel, position: TPosition) => TPixel) : ImageCore {
         this._loopWithPoints(pointOption, true);
         this.dataIsModified = true;
         return this;
     }
 
-    public forEach(pointOption: (point: TPoint) => void) : void {
+    public forEach(pointOption: (ppixel: TPixel, position: TPosition) => void) : void {
         this._loopWithPoints(pointOption);
     }
 }

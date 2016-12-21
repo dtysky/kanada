@@ -11,8 +11,8 @@ describe('ImageCore', () => {
     it('constructor, all member variables will be initialized', () => {
         let image = new ImageCore();
         expect(image.mode).toEqual('RGBA');
-        expect(image.size).toEqual({width: 1, height: 1});
-        expect(image.data).toEqual(new Uint8ClampedArray([]));
+        expect(image.size).toEqual([1, 1]);
+        expect(image.data).toEqual(new Uint8ClampedArray([0, 0, 0, 0]));
         expect(image.dataIsModified).toBeFalsy();
         image = new ImageCore('L');
         expect(image.mode).toEqual('L');
@@ -23,7 +23,7 @@ describe('ImageCore', () => {
         img.onload = () => {
             const image = new ImageCore();
             image.fromImage(img);
-            expect(image.size).toEqual({width: 20, height: 20});
+            expect(image.size).toEqual([20, 20]);
             expect(image.data).toEqual(white20x20);
             done();
         };
@@ -52,10 +52,27 @@ describe('ImageCore', () => {
             const url = '/base/testImages/white.png';
             image.fromUrl(url)
                 .then(img => {
-                    expect(img.size).toEqual({width: 20, height: 20});
+                    expect(img.size).toEqual([20, 20]);
                     expect(img.data).toEqual(white20x20);
                     done();
                 });
+        });
+    });
+
+    describe('fromBuffer, creating image data from buffer:', () => {
+        it ('failed with size', () => {
+            const image = new ImageCore();
+            try {
+                image.fromBuffer([10, 10], new Uint8ClampedArray(10));
+            } catch (err) {
+                expect(err.name).toEqual('BufferSizeError');
+            }
+        });
+        it('successful', () => {
+            const image = new ImageCore();
+            image.fromBuffer([20, 20], white20x20);
+            expect(image.size).toEqual([20, 20]);
+            expect(image.data).toEqual(white20x20);
         });
     });
 
@@ -70,19 +87,15 @@ describe('ImageCore', () => {
                 done();
             }
         });
-        it('successful', done => {
+        it('successful', () => {
             const image = new ImageCore();
             const image2 = new ImageCore();
-            const url = '/base/testImages/white.png';
-            image.fromUrl(url)
-                .then(img => {
-                    image2.copy(img);
-                    expect(image2.size).toEqual(img.size);
-                    expect(image2.data).toEqual(img.data);
-                    expect(image2.mode).toEqual(img.mode);
-                    expect(image2.dataIsModified).toEqual(img.dataIsModified);
-                    done();
-                });
+            image.fromBuffer([20, 20], white20x20);
+            image2.copy(image);
+            expect(image2.size).toEqual(image.size);
+            expect(image2.data).toEqual(image.data);
+            expect(image2.mode).toEqual(image.mode);
+            expect(image2.dataIsModified).toEqual(image.dataIsModified);
         });
     });
 
@@ -92,75 +105,71 @@ describe('ImageCore', () => {
         expect(image.mode).toEqual('L');
     });
 
-    it('setPixel and getPixel, setting or getting pixel in image with position:', done => {
+    it('setPixel and getPixel, setting or getting pixel in image with position:', () => {
         const image = new ImageCore();
-        const url = '/base/testImages/white.png';
-        image.fromUrl(url)
-            .then(img => {
-                img.setPixel([0, 0], [0, 0, 0, 1]);
-                img.setPixel([19, 19], [100, 100, 100, 1]);
-                expect(img.getPixel([0, 0])).toEqual(new Uint8ClampedArray([0, 0, 0, 1]));
-                expect(img.getPixel([19, 19])).toEqual(new Uint8ClampedArray([100, 100, 100, 1]));
-                done();
-            });
+        image.fromBuffer([20, 20], white20x20);
+        image.setPixel(0, 0, [0, 0, 0, 1]);
+        image.setPixel(19, 19, [100, 100, 100, 1]);
+        expect(image.getPixel(0, 0)).toEqual(new Uint8ClampedArray([0, 0, 0, 1]));
+        expect(image.getPixel(19, 19)).toEqual(new Uint8ClampedArray([100, 100, 100, 1]));
     });
 
-    it('modifyData, modify data with given option:', done => {
+    it('modifyData, modify data with given option:', () => {
         const image = new ImageCore();
-        const url = '/base/testImages/white.png';
-        image.fromUrl(url)
-            .then(img => {
-                img.modifyData((data, size) => {
-                    expect(size).toEqual({width: 20, height: 20});
-                    for (let pos = 0; pos < data.length; pos += 4) {
-                        data[pos] = 0;
-                        data[pos + 1] = 0;
-                        data[pos + 2] = 0;
-                        data[pos + 3] = 255;
-                    }
-                });
-                expect(img.data).toEqual(black20x20);
-                expect(img.dataIsModified).toBeTruthy();
-                done();
-            });
+        image.fromBuffer([20, 20], white20x20);
+        image.modifyData((data, size) => {
+            expect(size).toEqual([20, 20]);
+            for (let pos = 0; pos < data.length; pos += 4) {
+                data[pos] = 0;
+                data[pos + 1] = 0;
+                data[pos + 2] = 0;
+                data[pos + 3] = 255;
+            }
+        });
+        expect(image.data).toEqual(black20x20);
+        expect(image.dataIsModified).toBeTruthy();
     });
 
-    it('forEach, handling points with given option:', done => {
+    it('modifyContext, modify context with given option:', () => {
         const image = new ImageCore();
-        const url = '/base/testImages/white.png';
-        image.fromUrl(url)
-            .then(img => {
-                let x = 0;
-                let y = 0;
-                img.forEach(point => {
-                    const [position, pixel] = point;
-                    expect([x, y]).toEqual(position);
-                    expect(pixel).toEqual(new Uint8ClampedArray([255, 255, 255, 255]));
-                    y = x === 19 ? y + 1 : y;
-                    x = x === 19 ? 0 : x + 1;
-                });
-                done();
-            });
+        image.fromBuffer([20, 20], white20x20);
+        image.dataIsModified = true;
+        image.modifyContext((context, size) => {
+            expect(size).toEqual([20, 20]);
+            const data = new ImageData(20, 20);
+            data.data.set(black20x20, 0);
+            context.putImageData(data, 0, 0);
+        });
+        expect(image.data).toEqual(black20x20);
+        expect(image.dataIsModified).toBeFalsy();
     });
 
-    it('map, modify points with given option:', done => {
+    it('forEach, handling points with given option:', () => {
         const image = new ImageCore();
-        const url = '/base/testImages/white.png';
-        image.fromUrl(url)
-            .then(img => {
-                let x = 0;
-                let y = 0;
-                img.map(point => {
-                    const [position] = point;
-                    expect([x, y]).toEqual(position);
-                    y = x === 19 ? y + 1 : y;
-                    x = x === 19 ? 0 : x + 1;
-                    return [0, 0, 0, 255];
-                });
-                expect(img.data).toEqual(black20x20);
-                expect(img.dataIsModified).toBeTruthy();
-                done();
-            });
+        image.fromBuffer([20, 20], white20x20);
+        let x = 0;
+        let y = 0;
+        image.forEach((pixel, position) => {
+            expect([x, y]).toEqual(position);
+            expect(pixel).toEqual(new Uint8ClampedArray([255, 255, 255, 255]));
+            y = x === 19 ? y + 1 : y;
+            x = x === 19 ? 0 : x + 1;
+        });
+    });
+
+    it('map, modify points with given option:', () => {
+        const image = new ImageCore();
+        image.fromBuffer([20, 20], white20x20);
+        let x = 0;
+        let y = 0;
+        image.map((pixel, position) => {
+            expect([x, y]).toEqual(position);
+            y = x === 19 ? y + 1 : y;
+            x = x === 19 ? 0 : x + 1;
+            return [0, 0, 0, 255];
+        });
+        expect(image.data).toEqual(black20x20);
+        expect(image.dataIsModified).toBeTruthy();
     });
 
     describe('test for performance:', () => {
@@ -206,7 +215,7 @@ describe('ImageCore', () => {
             image.fromUrl(url)
                 .then(img => {
                     let s = performance.now();
-                    img.map(point => [0, 0, 0, 255]);
+                    img.map((pixel, position)  => [0, 0, 0, 255]);
                     // tslint:disable-next-line
                     console.log('Performance, ImageCore, map', img.size, img.mode, 'time(ms)', (performance.now() - s));
                     img.changeMode('L');

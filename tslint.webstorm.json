@@ -228,7 +228,7 @@
     "no-missing-visibility-modifiers": false,
     "no-multiple-var-decl": false,
     "no-switch-case-fall-through": false,
-    "no-unused-imports": false
+    "no-unused-imports": true
   },
   "rulesDirectory": "./"
 }

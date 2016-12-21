@@ -6,7 +6,7 @@
 
 import {Exceptions, ImageCore} from '../core';
 
-export function grayscale(image: ImageCore) {
+export function grayscale(image: ImageCore): ImageCore {
     if (image.mode !== 'RGBA' && image.mode !== 'RGB' && image.mode !== 'BGR' && image.mode !== 'BGRA') {
         throw new Exceptions.ImageModeError(image.mode, 'RGB', 'RGBA');
     }
@@ -64,5 +64,5 @@ export function grayscale(image: ImageCore) {
             break;
     }
     image.changeMode('L');
-    image.dataIsModified = true;
+    return image;
 }

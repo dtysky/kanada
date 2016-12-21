@@ -8,7 +8,7 @@ import {ImageCore} from '../../src/core';
 import {grayscale} from '../../src/point';
 
 describe('Grayscale', () => {
-    it ('failed with type', () => {
+    it('failed with type', () => {
         const image = new ImageCore('L');
         try {
             grayscale(image);
@@ -17,21 +17,25 @@ describe('Grayscale', () => {
         }
     });
 
+    describe('successful:', () => {
+        it('RGBA', done => {
+            const image = new ImageCore();
+            const url = '/base/testImages/rgba.png';
+            image.fromUrl(url)
+                .then(img => {
+                    grayscale(img);
+                    done();
+                });
+        });
+    });
+
     describe('test for performance:', () => {
-        fit ('RGBA', done => {
+        it('RGBA', done => {
             const image = new ImageCore();
             const url = '/base/testImages/rgba.png';
             image.fromUrl(url)
                 .then(img => {
                     const s = performance.now();
-                    grayscale(img);
-                    img.changeMode('RGBA');
-                    grayscale(img);
-                    img.changeMode('RGBA');
-                    grayscale(img);
-                    img.changeMode('RGBA');
-                    grayscale(img);
-                    img.changeMode('RGBA');
                     grayscale(img);
                     // tslint:disable-next-line
                     console.log('Performance, Grayscale, RGBA', img.size, img.mode, 'time(ms)', (performance.now() - s));
