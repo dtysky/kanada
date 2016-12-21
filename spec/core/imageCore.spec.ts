@@ -18,21 +18,31 @@ describe('ImageCore', () => {
         expect(image.mode).toEqual('L');
     });
 
-    it('fromImage, creating image data from HtmlImageElement', done => {
-        const img = new Image();
-        img.onload = () => {
-            const image = new ImageCore();
-            image.fromImage(img);
-            expect(image.size).toEqual([20, 20]);
-            expect(image.data).toEqual(white20x20);
-            done();
-        };
-        img.src = '/base/testImages/white.png';
+    describe('fromImage, creating image data from HtmlImageElement', () => {
+        it ('failed with type', () => {
+            const image = new ImageCore('RGB');
+            try {
+                image.fromImage(new Image());
+            } catch (err) {
+                expect(err.name).toEqual('ImageModeError');
+            }
+        });
+        it ('successful', done => {
+            const img = new Image();
+            img.onload = () => {
+                const image = new ImageCore();
+                image.fromImage(img);
+                expect(image.size).toEqual([20, 20]);
+                expect(image.data).toEqual(white20x20);
+                done();
+            };
+            img.src = '/base/testImages/white.png';
+        });
     });
 
     describe('fromUrl, creating image data from url:', () => {
         it ('failed with type', done => {
-            const image = new ImageCore('L');
+            const image = new ImageCore('RGB');
             image.fromUrl('')
                 .catch(err => {
                     expect(err.name).toEqual('ImageModeError');

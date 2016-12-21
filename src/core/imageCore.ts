@@ -37,6 +37,9 @@ export class ImageCore {
     }
 
     public fromImage(image: HTMLImageElement): ImageCore {
+        if (this._mode !== 'RGBA') {
+            throw new Exceptions.ImageModeError(this._mode, 'RGBA');
+        }
         const canvas = document.createElement('canvas');
         canvas.width = image.width;
         canvas.height = image.height;
@@ -81,9 +84,9 @@ export class ImageCore {
     }
 
     public fromUrl(url: string): Promise<ImageCore> {
-        if (this._mode !== 'RGBA' && this._mode !== 'RGB' && this._mode !== 'BGR' && this._mode !== 'BGRA') {
+        if (this._mode !== 'RGBA') {
             return new Promise((resolve, reject) =>
-                reject(new Exceptions.ImageModeError(this._mode, 'RGB', 'RGBA'))
+                reject(new Exceptions.ImageModeError(this._mode, 'RGBA'))
             );
         }
         return Environments.BROWSER_MODE
