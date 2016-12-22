@@ -12,9 +12,8 @@ export enum EColorSpaces {
     'L',
     'B',
     'CMYK',
-    'HLS',
-    'HSV',
-    'XYZ'
+    'HSL',
+    'HSV'
 }
 
 export const PIXEL_SIZE = {
@@ -24,8 +23,21 @@ export const PIXEL_SIZE = {
     BGRA: 4,
     L: 1,
     B: 1,
-    CMYK: 3,
-    HLS: 3,
-    HSV: 3,
-    XYZ: 3
+    CMYK: 4,
+    HSL: 3,
+    HSV: 3
+};
+
+export const COLOR_MAX = {
+    RGB: [255, 255, 255],
+    RGBA: [255, 255, 255, 255],
+    BGR: [255, 255, 255],
+    BGRA: [255, 255, 255, 255],
+    L: [255],
+    B: [255],
+    // normalize the range from 0 ~ 1 -> 0 ~ 255
+    CMYK: [255, 255, 255, 255],
+    // normalize the hue from 0 ~ 360 -> 0 ~ 255
+    HSL: [240, 255, 255],
+    HSV: [240, 255, 255]
 };

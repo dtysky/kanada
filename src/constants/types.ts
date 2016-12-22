@@ -7,7 +7,7 @@
 /**
  * Type of color spaces.
  */
-export type TColorSpaces =
+export type TColorSpace =
     'RGBA'
     | 'RGB'
     | 'BGR'
@@ -15,9 +15,8 @@ export type TColorSpaces =
     | 'L'
     | 'B'
     | 'CMYK'
-    | 'HLS'
-    | 'HSV'
-    | 'XYZ';
+    | 'HSL'
+    | 'HSV';
 
 /**
  * Type of image's size, it should be [width, height].

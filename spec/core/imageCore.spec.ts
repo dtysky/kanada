@@ -24,14 +24,14 @@ describe('ImageCore', () => {
             try {
                 image.fromImage(new Image());
             } catch (err) {
-                expect(err.name).toEqual('ImageModeError');
+                expect(err.name).toEqual('ColorSpaceError');
             }
         });
         it ('successful', done => {
             const img = new Image();
             img.onload = () => {
                 const image = new ImageCore();
-                image.fromImage(img);
+                expect(image.fromImage(img)).toEqual(jasmine.any(ImageCore));
                 expect(image.size).toEqual([20, 20]);
                 expect(image.data).toEqual(white20x20);
                 done();
@@ -45,7 +45,7 @@ describe('ImageCore', () => {
             const image = new ImageCore('RGB');
             image.fromUrl('')
                 .catch(err => {
-                    expect(err.name).toEqual('ImageModeError');
+                    expect(err.name).toEqual('ColorSpaceError');
                     done();
                 });
         });
@@ -80,7 +80,7 @@ describe('ImageCore', () => {
         });
         it('successful', () => {
             const image = new ImageCore();
-            image.fromBuffer([20, 20], white20x20);
+            expect(image.fromBuffer([20, 20], white20x20)).toEqual(jasmine.any(ImageCore));
             expect(image.size).toEqual([20, 20]);
             expect(image.data).toEqual(white20x20);
         });
@@ -93,7 +93,7 @@ describe('ImageCore', () => {
             try {
                 image2.copy(image);
             } catch (err) {
-                expect(err.name).toBe('ImageModeError');
+                expect(err.name).toBe('ColorSpaceError');
                 done();
             }
         });
@@ -101,17 +101,14 @@ describe('ImageCore', () => {
             const image = new ImageCore();
             const image2 = new ImageCore();
             image.fromBuffer([20, 20], white20x20);
-            image2.copy(image);
-            expect(image2.size).toEqual(image.size);
-            expect(image2.data).toEqual(image.data);
-            expect(image2.mode).toEqual(image.mode);
-            expect(image2.dataIsModified).toEqual(image.dataIsModified);
+            expect(image2.copy(image)).toEqual(image);
+            expect(image2).toEqual(image);
         });
     });
 
     it('changeMode, change mode of image:', () => {
         const image = new ImageCore();
-        image.changeMode('L');
+        expect(image.changeMode('L')).toEqual(jasmine.any(ImageCore));
         expect(image.mode).toEqual('L');
     });
 
@@ -127,7 +124,7 @@ describe('ImageCore', () => {
     it('modifyData, modify data with given option:', () => {
         const image = new ImageCore();
         image.fromBuffer([20, 20], white20x20);
-        image.modifyData((data, size) => {
+        expect(image.modifyData((data, size) => {
             expect(size).toEqual([20, 20]);
             for (let pos = 0; pos < data.length; pos += 4) {
                 data[pos] = 0;
@@ -135,7 +132,7 @@ describe('ImageCore', () => {
                 data[pos + 2] = 0;
                 data[pos + 3] = 255;
             }
-        });
+        })).toEqual(jasmine.any(ImageCore));
         expect(image.data).toEqual(black20x20);
         expect(image.dataIsModified).toBeTruthy();
     });
@@ -144,12 +141,12 @@ describe('ImageCore', () => {
         const image = new ImageCore();
         image.fromBuffer([20, 20], white20x20);
         image.dataIsModified = true;
-        image.modifyContext((context, size) => {
+        expect(image.modifyContext((context, size) => {
             expect(size).toEqual([20, 20]);
             const data = new ImageData(20, 20);
             data.data.set(black20x20, 0);
             context.putImageData(data, 0, 0);
-        });
+        })).toEqual(jasmine.any(ImageCore));
         expect(image.data).toEqual(black20x20);
         expect(image.dataIsModified).toBeFalsy();
     });
@@ -159,12 +156,12 @@ describe('ImageCore', () => {
         image.fromBuffer([20, 20], white20x20);
         let x = 0;
         let y = 0;
-        image.forEach((pixel, position) => {
+        expect(image.forEach((pixel, position) => {
             expect([x, y]).toEqual(position);
             expect(pixel).toEqual(new Uint8ClampedArray([255, 255, 255, 255]));
             y = x === 19 ? y + 1 : y;
             x = x === 19 ? 0 : x + 1;
-        });
+        })).toEqual(jasmine.any(ImageCore));
     });
 
     it('map, modify points with given option:', () => {
@@ -172,12 +169,12 @@ describe('ImageCore', () => {
         image.fromBuffer([20, 20], white20x20);
         let x = 0;
         let y = 0;
-        image.map((pixel, position) => {
+        expect(image.map((pixel, position) => {
             expect([x, y]).toEqual(position);
             y = x === 19 ? y + 1 : y;
             x = x === 19 ? 0 : x + 1;
             return [0, 0, 0, 255];
-        });
+        })).toEqual(jasmine.any(ImageCore));
         expect(image.data).toEqual(black20x20);
         expect(image.dataIsModified).toBeTruthy();
     });

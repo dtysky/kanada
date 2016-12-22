@@ -4,11 +4,14 @@
  * Description: a set of errors.
  */
 
-import {TColorSpaces} from '../constants';
+import {TColorSpace} from '../constants';
 
 export namespace Exceptions {
     class BaseError extends Error {
-        constructor(name: string = 'BaseError', message: string) {
+        constructor(
+            name: string = 'BaseError',
+            message: string
+        ) {
             super();
             this.name = name;
             this.stack = (new Error()).stack;
@@ -16,23 +19,32 @@ export namespace Exceptions {
         }
     }
 
-    export class ImageModeError extends BaseError {
-        constructor(currentMode: TColorSpaces, ...expectedModes: TColorSpaces[]) {
+    export class ColorSpaceError extends BaseError {
+        constructor(
+            paramName: string,
+            currentSpace: TColorSpace,
+            ...expectedSpace: TColorSpace[]
+        ) {
             super(
-                'ImageModeError',
-                `Image's mode is error, expect '${expectedModes.join(' or ')}' but current is '${currentMode}'.`
+                'ColorSpaceError',
+                `Color space is error, ${paramName} couldn't be '${currentSpace}, expect '${expectedSpace.join(' or ')}'.`
             );
         }
     }
 
     export class InvalidImagePathError extends BaseError {
-        constructor(path: string) {
+        constructor(
+            path: string
+        ) {
             super('InvalidImagePathError', `Image which has path '${path}' is invalid, check your url !`);
         }
     }
 
     export class BufferSizeError extends BaseError {
-        constructor(currentSize: number, expectedSize: number) {
+        constructor(
+            currentSize: number,
+            expectedSize: number
+        ) {
             super(
                 'BufferSizeError',
                 `Buffer's size is error, expect '${expectedSize}' but current is '${currentSize}'.`

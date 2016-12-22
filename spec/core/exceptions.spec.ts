@@ -7,11 +7,11 @@
 import {Exceptions} from '../../src/core';
 
 describe('Exceptions', () => {
-    it('ImageModeError', () => {
-        const error = new Exceptions.ImageModeError('L', 'RGBA', 'RGB');
-        expect(error.name).toEqual('ImageModeError');
+    it('ColorSpaceError', () => {
+        const error = new Exceptions.ColorSpaceError('test', 'L', 'RGBA', 'RGB');
+        expect(error.name).toEqual('ColorSpaceError');
         // tslint:disable-next-line
-        expect(error.message).toEqual("Image's mode is error, expect 'RGBA or RGB' but current is 'L'.");
+        expect(error.message).toEqual("Color space is error, test couldn't be 'L', expect 'RGBA or RGB'.");
     });
 
     it ('InvalidImagePathError', () => {
@@ -19,6 +19,13 @@ describe('Exceptions', () => {
         expect(error.name).toEqual('InvalidImagePathError');
         // tslint:disable-next-line
         expect(error.message).toEqual("Image which has path 'test' is invalid, check your url !");
+    });
+
+    it ('BufferSizeError', () => {
+        const error = new Exceptions.BufferSizeError(100, 200);
+        expect(error.name).toEqual('BufferSizeError');
+        // tslint:disable-next-line
+        expect(error.message).toEqual("Buffer's size is error, expect '200' but current is '100'.");
     });
 
 });

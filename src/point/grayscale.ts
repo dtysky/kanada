@@ -6,9 +6,11 @@
 
 import {Exceptions, ImageCore} from '../core';
 
-export function grayscale(image: ImageCore): ImageCore {
+export function grayscale(
+    image: ImageCore
+): ImageCore {
     if (image.mode !== 'RGBA' && image.mode !== 'RGB' && image.mode !== 'BGR' && image.mode !== 'BGRA') {
-        throw new Exceptions.ImageModeError(image.mode, 'RGB', 'RGBA');
+        throw new Exceptions.ColorSpaceError('the mode of image to be grayscaled', image.mode, 'RGB', 'RGBA');
     }
     const size = image.data.length;
     switch (image.mode) {
@@ -39,6 +41,5 @@ export function grayscale(image: ImageCore): ImageCore {
         default:
             break;
     }
-    image.changeMode('L');
-    return image;
+    return image.changeMode('L');
 }
