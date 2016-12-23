@@ -5,7 +5,6 @@
  */
 
 import {genSamePointsBuffer} from '../utils';
-import {TBuffer} from '../../src/constants';
 
 // grayscale
 export const rgba20x20 = genSamePointsBuffer([20, 20], [50, 100, 150, 200]);

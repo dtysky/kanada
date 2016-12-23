@@ -7,7 +7,7 @@
 import {ImageCore} from '../core';
 import {COLOR_MAX} from '../constants';
 
-export function colorReversal(
+export function colorInvert(
     image: ImageCore
 ): ImageCore {
     const size = image.data.length;

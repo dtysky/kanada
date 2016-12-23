@@ -6,4 +6,4 @@
 
 export * from './grayscale';
 export * from './colorSpaceConvert';
-export * from './colorReverse';
+export * from './colorInvert';

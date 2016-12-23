@@ -30,7 +30,7 @@ describe('Grayscale', () => {
             expect(image.mode).toEqual('L');
         });
         it('RGB', () => {
-            const image = new ImageCore();
+            const image = new ImageCore('RGB');
             image.fromBuffer([20, 20], rgb20x20);
             expect(grayscale(image)).toEqual(jasmine.any(ImageCore));
             expect(image.data).toEqual(gray20x20Rgb);
