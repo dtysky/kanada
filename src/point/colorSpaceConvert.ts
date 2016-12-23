@@ -7,11 +7,33 @@
 import {ImageCore, Exceptions} from '../core';
 import {COLOR_MAX, TColorSpace} from '../constants';
 
+function getRGBColorFromHSL(
+    p: number,
+    q: number,
+    t: number,
+    max: number
+): number {
+    return (
+            t < 0.1667
+                ? (p + ((q - p)) * 6 * t)
+                : t < 0.5
+                    ? q
+                    : t < 0.6667
+                        ? p + ((q - p) * 6 * (0.6667 - t))
+                        : p
+        ) * max;
+}
+
 export function colorSpaceConvert(
     image: ImageCore,
     dstMode: TColorSpace
 ): ImageCore {
     const size = image.data.length;
+
+    // No conversion needed
+    if (image.mode === dstMode) {
+        return image;
+    }
 
     switch (`${image.mode}_${dstMode}`) {
         // Just converting alpha channel
@@ -67,11 +89,6 @@ export function colorSpaceConvert(
         );
     }
 
-    // No conversion needed
-    if (image.mode === dstMode) {
-        return image;
-    }
-
     switch (`${image.mode}_${dstMode}`) {
         case 'RGBA_BGR':
             image.modifyData(data => {
@@ -99,28 +116,28 @@ export function colorSpaceConvert(
         }
         // the alpha channel will be removed
         case 'RGBA_CMYK': {
-            const [cmax, mmax, ymax, kmax] = COLOR_MAX[image.mode];
+            const [rmax, gmax, bmax] = COLOR_MAX.RGBA;
+            const [kmax] = COLOR_MAX.CMYK;
             image.modifyData(data => {
                 for (let pos = 0; pos < size; pos += 4) {
                     // from http://www.boost.org/doc/libs/1_53_0/boost/gil/color_convert.hpp
-                    const c = cmax - data[pos];
-                    const m = mmax - data[pos + 1];
-                    const y = ymax - data[pos + 2];
-                    const k = Math.min(c, m, y);
-                    const x = (kmax - data[pos + 3]) / kmax;
-                    data[pos] = ~~((c - k) / x);
-                    data[pos + 1] = ~~((m - k) / x);
-                    data[pos + 2] = ~~((y - k) / x);
+                    const dR = rmax - data[pos];
+                    const dG = gmax - data[pos + 1];
+                    const dB = bmax - data[pos + 2];
+                    const k = Math.min(dR, dG, dB);
+                    const x = (kmax - k) / kmax;
+                    data[pos] = ~~((dR - k) / x);
+                    data[pos + 1] = ~~((dG - k) / x);
+                    data[pos + 2] = ~~((dB - k) / x);
                     data[pos + 3] = k;
                 }
             });
             break;
         }
         case 'RGBA_HSL': {
-            const [hmax, , lmax] = COLOR_MAX[image.mode];
+            // http://www.rapidtables.com/convert/color/rgb-to-hsl.htm
+            const [hmax, smax , lmax] = COLOR_MAX.HSL;
             const h1p6 = ~~(60 * hmax / 360);
-            const h1p3 = ~~(120 * hmax / 360);
-            const h2p3 = ~~(240 * hmax / 360);
             const l1p2 = lmax >> 1;
             image.modifyData(data => {
                 for (let pos = 0; pos < size; pos += 4) {
@@ -133,37 +150,36 @@ export function colorSpaceConvert(
                     const sv = max + min;
                     const l = sv >> 1;
                     data[pos + 2] = l;
+                    if (l === 0 || dv === 0) {
+                        data[pos + 1] = 0;
+                    } else if (l <= l1p2) {
+                        data[pos + 1] = ~~(lmax * dv / sv);
+                    } else {
+                        data[pos + 1] = ~~(lmax * dv / (2 * smax - sv));
+                    }
                     switch (max) {
                         case min:
                             data[pos] = 0;
-                            break;
+                            continue;
                         case r:
-                            data[pos] = g >= b ? ~~(h1p6 * (g - b) / dv) : ~~(hmax - h1p6 * (b - g) / dv);
-                            break;
+                            data[pos] = ~~(h1p6 * ((g - b) % 6) / dv);
+                            continue;
                         case g:
-                            data[pos] = ~~(h1p3 + h1p6 * (b - r) / dv);
-                            break;
+                            data[pos] = ~~(h1p6 * ((b - r) / dv + 2));
+                            continue;
                         case b:
-                            data[pos] = ~~(h2p3 + h1p6 * (r - g) / dv);
-                            break;
+                            data[pos] = ~~(h1p6 * ((r - g) / dv + 4));
+                            continue;
                         default:
-                            break;
+                            continue;
                     }
-                    if (l === 0 || dv === 0) {
-                        data[pos + 1] = 0;
-                        return;
-                    }
-                    if (l <= l1p2) {
-                        data[pos + 1] = ~~(lmax * dv / sv);
-                        return;
-                    }
-                    data[pos + 1] = ~~(lmax * dv / (2 * lmax - sv));
                 }
             });
             break;
         }
         case 'RGBA_HSV': {
-            const [hmax, smax] = COLOR_MAX[image.mode];
+            // from https://en.wikipedia.org/wiki/HSL_and_HSV
+            const [hmax, smax] = COLOR_MAX.HSV;
             const h1p6 = ~~(60 * hmax / 360);
             const h1p3 = ~~(120 * hmax / 360);
             const h2p3 = ~~(240 * hmax / 360);
@@ -175,25 +191,25 @@ export function colorSpaceConvert(
                     const max = Math.max(r, g, b);
                     const min = Math.min(r, g, b);
                     data[pos + 2] = max;
+                    data[pos + 1] = max === 0 ? 0 : ~~(smax * (1 - min / max));
                     switch (max) {
                         case min:
                             data[pos] = 0;
-                            break;
+                            continue;
                         case r:
                             data[pos] = g >= b
                                 ? ~~(h1p6 * (g - b) / (max - min))
                                 : ~~(hmax - h1p6 * (b - g) / (max - min));
-                            break;
+                            continue;
                         case g:
                             data[pos] = ~~(h1p3 + h1p6 * (b - r) / (max - min));
-                            break;
+                            continue;
                         case b:
                             data[pos] = ~~(h2p3 + h1p6 * (r - g) / (max - min));
-                            break;
+                            continue;
                         default:
-                            break;
+                            continue;
                     }
-                    data[pos + 1] = max === 0 ? 0 : ~~(smax * (1 - min / max));
                 }
             });
             break;
@@ -214,23 +230,104 @@ export function colorSpaceConvert(
             break;
         }
         case 'HSL_RGBA': {
-            const [max1, max2, max3] = COLOR_MAX[image.mode];
+            // from http://www.rapidtables.com/convert/color/hsl-to-rgb.htm
+            const [rmax, gmax, bmax] = COLOR_MAX.RGBA;
+            const [hmax, smax, lmax] = COLOR_MAX.HSL;
+            const h1p6 = hmax / 6;
             image.modifyData(data => {
                 for (let pos = 0; pos < size; pos += 4) {
-                    data[pos] = max1 - data[pos];
-                    data[pos + 1] = max2 - data[pos + 1];
-                    data[pos + 2] = max3 - data[pos + 2];
+                    const h = data[pos] / h1p6;
+                    const s = data[pos + 1] / smax;
+                    const l = data[pos + 2] / lmax;
+                    const c = l < 0.5 ? (l * s) * 2 : ((1 - l) * s) * 2;
+                    const x = c * (1 - Math.abs(h % 2 - 1));
+                    const m = l - (c / 2);
+                    switch (h >> 0) {
+                        case 0:
+                            data[pos] = (c + m) * rmax;
+                            data[pos + 1] = (x + m) * gmax;
+                            data[pos + 2] = m * bmax;
+                            continue;
+                        case 1:
+                            data[pos] = (x + m) * rmax;
+                            data[pos + 1] = (c + m) * gmax;
+                            data[pos + 2] = m * bmax;
+                            continue;
+                        case 2:
+                            data[pos] = m * rmax;
+                            data[pos + 1] = (c + m) * gmax;
+                            data[pos + 2] = (x + m) * bmax;
+                            continue;
+                        case 3:
+                            data[pos] = m * rmax;
+                            data[pos + 1] = (x + m) * gmax;
+                            data[pos + 2] = (c + m) * bmax;
+                            continue;
+                        case 4:
+                            data[pos] = (x + m) * rmax;
+                            data[pos + 1] = m * gmax;
+                            data[pos + 2] = (c + m) * bmax;
+                            continue;
+                        case 5:
+                            data[pos] = (c + m) * rmax;
+                            data[pos + 1] = m * gmax;
+                            data[pos + 2] = (x + m) * bmax;
+                            continue;
+                    }
                 }
             });
             break;
         }
         case 'HSV_RGBA': {
-            const [max1, max2, max3] = COLOR_MAX[image.mode];
+            // from https://en.wikipedia.org/wiki/HSL_and_HSV
+            const [rmax, gmax, bmax] = COLOR_MAX.RGBA;
+            const [hmax, smax, vmax] = COLOR_MAX.HSV;
+            const h1p6 = ~~(60 * hmax / 360);
             image.modifyData(data => {
                 for (let pos = 0; pos < size; pos += 4) {
-                    data[pos] = max1 - data[pos];
-                    data[pos + 1] = max2 - data[pos + 1];
-                    data[pos + 2] = max3 - data[pos + 2];
+                    const h = data[pos];
+                    const s = data[pos + 1] / smax;
+                    const v = data[pos + 2] / vmax;
+                    const ht = h / h1p6;
+                    const hi = ~~ht;
+                    const f = ht - hi;
+                    const p = v * (1 - s);
+                    const q = v * (1 - f * s);
+                    const t = v * (1 - (1 - f) * s);
+                    switch (hi) {
+                        case 0:
+                            data[pos] = v * rmax;
+                            data[pos + 1] = t * gmax;
+                            data[pos + 2] = p * bmax;
+                            continue;
+                        case 1:
+                            data[pos] = q * rmax;
+                            data[pos + 1] = v * gmax;
+                            data[pos + 2] = p * bmax;
+                            continue;
+                        case 2:
+                            data[pos] = p * rmax;
+                            data[pos + 1] = v * gmax;
+                            data[pos + 2] = t * bmax;
+                            continue;
+                        case 3:
+                            data[pos] = p * rmax;
+                            data[pos + 1] = q * gmax;
+                            data[pos + 2] = v * bmax;
+                            continue;
+                        case 4:
+                            data[pos] = t * rmax;
+                            data[pos + 1] = p * gmax;
+                            data[pos + 2] = v * bmax;
+                            continue;
+                        case 5:
+                            data[pos] = v * rmax;
+                            data[pos + 1] = p * gmax;
+                            data[pos + 2] = q * bmax;
+                            continue;
+                        default:
+                            continue;
+                    }
                 }
             });
             break;

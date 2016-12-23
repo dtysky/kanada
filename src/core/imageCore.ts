@@ -57,7 +57,8 @@ export class ImageCore {
 
     public fromBuffer(
         size: TImageSize,
-        buffer: TBuffer
+        buffer: TBuffer,
+        mode?: TColorSpace
     ): ImageCore {
         if (size[0] * size[1] * 4 !== buffer.length) {
             throw new Exceptions.BufferSizeError(buffer.length, size[0] * size[1] * 4);
@@ -70,6 +71,7 @@ export class ImageCore {
         this._data.data.set(buffer, 0);
         context.putImageData(this._data, 0, 0);
         this._context = context;
+        this._mode = mode || this._mode;
         return this;
     }
 
@@ -157,7 +159,7 @@ export class ImageCore {
         pixel: TPixel
     ): ImageCore {
         const start = (this._data.width * y + x) * PIXEL_SIZE[this._mode];
-        this.data.set(new Uint8ClampedArray(pixel), start);
+        this._data.data.set(new Uint8ClampedArray(pixel), start);
         return this;
     }
 
@@ -166,7 +168,7 @@ export class ImageCore {
         y: TCoord
     ): TPixel {
         const start = (this._data.width * y + x) * PIXEL_SIZE[this._mode];
-        return this.data.subarray(start, start + PIXEL_SIZE[this._mode]);
+        return this._data.data.subarray(start, start + PIXEL_SIZE[this._mode]);
     }
 
     private _loopWithPoints(
@@ -179,12 +181,12 @@ export class ImageCore {
         let y = 0;
         for (let pos = 0; pos < size; pos += 4) {
             if (modify) {
-                this.data.set(
-                    pointOption(this.data.subarray(pos, pos + PIXEL_SIZE[this._mode]), [x, y]),
+                this._data.data.set(
+                    pointOption(this._data.data.subarray(pos, pos + PIXEL_SIZE[this._mode]), [x, y]),
                     pos
                 );
             } else {
-                pointOption(this.data.subarray(pos, pos + PIXEL_SIZE[this._mode]), [x, y]);
+                pointOption(this._data.data.subarray(pos, pos + PIXEL_SIZE[this._mode]), [x, y]);
             }
             y = x === rowSize ? y + 1 : y;
             x = x === rowSize ? 0 : x + 1;

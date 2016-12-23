@@ -5,3 +5,4 @@
  */
 
 export * from './grayscale';
+export * from './colorSpaceConvert';

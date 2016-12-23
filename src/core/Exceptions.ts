@@ -27,7 +27,7 @@ export namespace Exceptions {
         ) {
             super(
                 'ColorSpaceError',
-                `Color space is error, ${paramName} couldn't be '${currentSpace}, expect '${expectedSpace.join(' or ')}'.`
+                `Color space is error, ${paramName} couldn't be '${currentSpace}', expect '${expectedSpace.join(' or ')}'.`
             );
         }
     }

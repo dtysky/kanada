@@ -37,7 +37,8 @@ export const COLOR_MAX = {
     B: [255],
     // normalize the range from 0 ~ 1 -> 0 ~ 255
     CMYK: [255, 255, 255, 255],
-    // normalize the hue from 0 ~ 360 -> 0 ~ 255
+    // normalize the hue from 0 ~ 360 -> 0 ~ 255, s and l should equal to r g b
     HSL: [240, 255, 255],
+    // normalize the hue from 0 ~ 360 -> 0 ~ 255, s and l should equal to r g b
     HSV: [240, 255, 255]
 };
