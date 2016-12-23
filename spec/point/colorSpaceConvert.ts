@@ -49,10 +49,10 @@ describe('ColorSpaceConvert', () => {
             expect(image.mode).toEqual('RGBA');
         });
         it('L to RGBA', () => {
-            const image = new ImageCore('RGB');
+            const image = new ImageCore('L');
             image.fromBuffer([20, 20], TD.cscL2RGBA20x20L);
             expect(colorSpaceConvert(image, 'RGBA')).toEqual(jasmine.any(ImageCore));
-            expect(image.data).toEqual(TD.cscL2RGBA20x20L);
+            expect(image.data).toEqual(TD.cscL2RGBA20x20RGBA);
             expect(image.mode).toEqual('RGBA');
         });
         it('RGBA to BGR', () => {
@@ -116,7 +116,7 @@ describe('ColorSpaceConvert', () => {
         });
     });
 
-    fdescribe('test for performance:', () => {
+    describe('test for performance:', () => {
         it('RGB to RGBA', done => {
             const image = new ImageCore();
             const url = '/base/testImages/rgba.png';

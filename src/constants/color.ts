@@ -16,6 +16,10 @@ export enum EColorSpaces {
     'HSV'
 }
 
+export const COLOR_SPACES = Object.keys(EColorSpaces).filter(
+    color => !(parseInt(color, 10) >= 0)
+);
+
 export const PIXEL_SIZE = {
     RGB: 3,
     RGBA: 4,
