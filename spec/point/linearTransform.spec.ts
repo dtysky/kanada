@@ -1,22 +1,22 @@
 /**
  * Copyright(c) dtysky<dtysky@outlook.com>
- * Created: 16/12/23
- * Description: testing for ColorReverse.
+ * Created: 16/12/24
+ * Description: testing for point/linearTransform
  */
 
 import {ImageCore} from '../../src/core';
 import {COLOR_SPACES, TColorSpace} from '../../src/constants';
-import {colorInvert} from '../../src/point';
+import {linearTransform} from '../../src/point';
 import * as TD from './imageData.testcase';
 
-describe('ColorInvert', () => {
+describe('LinearTransform', () => {
     describe('successful:', () => {
         for (const color of COLOR_SPACES) {
             it(color, () => {
                 const image = new ImageCore();
-                image.fromBuffer([20, 20], TD.CR20x20[`${color}_O`], <TColorSpace>color);
-                expect(colorInvert(image)).toEqual(jasmine.any(ImageCore));
-                expect(image.data).toEqual(TD.CR20x20[`${color}_R`]);
+                image.fromBuffer([20, 20], TD.LT20x20[`${color}_O`], <TColorSpace>color);
+                expect(linearTransform(image, TD.LT20x20[`${color}_G`])).toEqual(jasmine.any(ImageCore));
+                expect(image.data).toEqual(TD.LT20x20[`${color}_R`]);
                 expect(image.mode).toEqual(color);
             });
         }
@@ -31,12 +31,13 @@ describe('ColorInvert', () => {
                     .then(img => {
                         img.changeMode(<TColorSpace>color);
                         const s = performance.now();
-                        colorInvert(img);
+                        linearTransform(img, TD.LT20x20[`${color}_G`]);
                         // tslint:disable-next-line
-                        console.log('Performance, colorInvert', color, img.size, img.mode, 'time(ms)', (performance.now() - s));
+                        console.log('Performance, linearTransform', color, img.size, img.mode, 'time(ms)', (performance.now() - s));
                         done();
                     });
             });
         }
     });
 });
+

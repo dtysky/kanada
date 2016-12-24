@@ -7,3 +7,4 @@
 export * from './grayscale';
 export * from './colorSpaceConvert';
 export * from './colorInvert';
+export * from './linearTransform';

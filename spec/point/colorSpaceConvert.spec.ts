@@ -1,7 +1,7 @@
 /**
  * Copyright(c) dtysky<dtysky@outlook.com>
  * Created: 16/12/22
- * Description: testing for colorSpaceConvert.
+ * Description: testing for point/colorSpaceConvert.
  */
 
 import {ImageCore} from '../../src/core';

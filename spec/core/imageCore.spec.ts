@@ -1,7 +1,7 @@
 /**
  * Copyright(c) dtysky<dtysky@outlook.com>
  * Created: 16/12/18
- * Description: testing for core/ImageCore.
+ * Description: testing for core/imageCore.
  */
 
 import {ImageCore} from '../../src/core';

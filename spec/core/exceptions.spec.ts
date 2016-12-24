@@ -1,7 +1,7 @@
 /**
  * Copyright(c) dtysky<dtysky@outlook.com>
  * Created: 16/12/19
- * Description: Tests for exceptions.
+ * Description: Tests for core/exceptions.
  */
 
 import {Exceptions} from '../../src/core';
