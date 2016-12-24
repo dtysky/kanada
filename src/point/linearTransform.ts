@@ -9,7 +9,7 @@ import {COLOR_MAX, TChannel} from '../constants';
 
 export function linearTransform(
     image: ImageCore,
-    gains: TChannel[]
+    gains: number[]
 ): ImageCore {
     const size = image.data.length;
     switch (image.mode) {

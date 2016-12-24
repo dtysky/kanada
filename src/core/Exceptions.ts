@@ -4,7 +4,7 @@
  * Description: a set of errors.
  */
 
-import {TColorSpace} from '../constants';
+import {TColorSpace, TColorTrans} from '../constants';
 
 export namespace Exceptions {
     class BaseError extends Error {
@@ -48,6 +48,19 @@ export namespace Exceptions {
             super(
                 'BufferSizeError',
                 `Buffer's size is error, expect '${expectedSize}' but current is '${currentSize}'.`
+            );
+        }
+    }
+
+    export class ColorTransModeError extends BaseError {
+        constructor(
+            paramName: string,
+            currentMode: TColorTrans,
+            ...expectedMode: TColorTrans[]
+        ) {
+            super(
+                'TransformModeError',
+                `Transformation's mode is error, ${paramName} couldn't be '${currentMode}', expect '${expectedMode.join(' or ')}'.`
             );
         }
     }

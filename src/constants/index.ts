@@ -5,5 +5,5 @@
  */
 
 export * from './types';
-export * from './color';
+export * from './variables';
 export * from './environments';

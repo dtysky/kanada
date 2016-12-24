@@ -98,3 +98,42 @@ export namespace LT20x20 {
     export const HSL_O = LT20x20.HSV_O;
     export const HSL_R = LT20x20.HSV_R;
 }
+
+// logTransform
+export namespace LOGT20x20 {
+    export const RGBA_T = [37, 0.1, 26.5];
+    export const RGBA_O = genSamePointsBuffer([20, 20], [150, 100, 50, 200]);
+    export const RGBA_R = genSamePointsBuffer([20, 20], [255, 0, 150, 200]);
+
+    export const RGB_T = LOGT20x20.RGBA_T;
+    export const RGB_O = genSamePointsBuffer([20, 20], [150, 100, 50, 255]);
+    export const RGB_R = genSamePointsBuffer([20, 20], [255, 0, 150, 255]);
+
+    export const BGRA_T = LOGT20x20.RGBA_T;
+    export const BGRA_O = LOGT20x20.RGB_O;
+    export const BGRA_R = LOGT20x20.RGB_R;
+
+    export const BGR_T = LOGT20x20.RGB_T;
+    export const BGR_O = LOGT20x20.RGB_O;
+    export const BGR_R = LOGT20x20.RGB_R;
+
+    export const L_T = [34.6];
+    export const L_O = genSamePointsBuffer([20, 20], [150, 100, 50, 200]);
+    export const L_R = genSamePointsBuffer([20, 20], [250, 100, 50, 200]);
+
+    export const B_T = LOGT20x20.L_T;
+    export const B_O = LOGT20x20.L_O;
+    export const B_R = LOGT20x20.L_R;
+
+    export const CMYK_T = [37, 0.1, 26.5, 19.7];
+    export const CMYK_O = genSamePointsBuffer([20, 20], [150, 100, 50, 200]);
+    export const CMYK_R = genSamePointsBuffer([20, 20], [255, 0, 150, 150]);
+
+    export const HSV_T = [34, 0.1, 26.5];
+    export const HSV_O = genSamePointsBuffer([20, 20], [150, 100, 50, 200]);
+    export const HSV_R = genSamePointsBuffer([20, 20], [240, 0, 150, 200]);
+
+    export const HSL_T = LOGT20x20.HSV_T;
+    export const HSL_O = LOGT20x20.HSV_O;
+    export const HSL_R = LOGT20x20.HSV_R;
+}

@@ -19,6 +19,14 @@ export type TColorSpace =
     | 'HSV';
 
 /**
+ * Type of nonlinear transformation.
+ */
+export type TColorTrans =
+    'Linear'
+    | 'Log'
+    | 'Gamma';
+
+/**
  * Type of image's size, it should be [width, height].
  */
 export type TImageSize = [number, number];
