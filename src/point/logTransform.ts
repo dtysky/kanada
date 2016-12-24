@@ -4,8 +4,24 @@
  * Description: logarithmic transformation for each channel of pixels.
  */
 
-import {ImageCore} from '../core';
-import {COLOR_MAX} from '../constants';
+import {ImageCore, Exceptions} from '../core';
+import {COLOR_MAX, TSize, TChannel} from '../constants';
+
+function checkSize(
+    times: number[],
+    expectSize: TSize
+): void {
+    if (times.length !== expectSize) {
+        throw new Exceptions.ArraySizeError('LogTransform times', times.length, expectSize);
+    }
+}
+
+function getBorder(
+    max: TChannel,
+    times: number
+): TChannel {
+    return Math.pow(2, max / times) - 1;
+}
 
 /**
  * Logarithmic transformation, O = times * log(1 + I).
@@ -25,11 +41,12 @@ export function logTransform(
         case 'BGRA':
         case 'HSL':
         case 'HSV': {
+            checkSize(times, 3);
             const [max1, max2, max3] = COLOR_MAX[image.mode];
             const [t1, t2, t3] = times;
-            const border1 = Math.pow(2, max1 / t1) - 1;
-            const border2 = Math.pow(2, max2 / t2) - 1;
-            const border3 = Math.pow(2, max3 / t3) - 1;
+            const border1 = getBorder(max1, t1);
+            const border2 = getBorder(max2, t2);
+            const border3 = getBorder(max3, t3);
             image.modifyData(data => {
                 for (let pos = 0; pos < size; pos += 4) {
                     data[pos] = data[pos] > border1 ? max1 : ~~(t1 * Math.log2(1 + data[pos]));
@@ -41,9 +58,10 @@ export function logTransform(
         }
         case 'L':
         case 'B': {
+            checkSize(times, 1);
             const [max1] = COLOR_MAX[image.mode];
             const [t1] = times;
-            const border1 = Math.pow(2, max1 / t1) - 1;
+            const border1 = getBorder(max1, t1);
             image.modifyData(data => {
                 for (let pos = 0; pos < size; pos += 4) {
                     data[pos] = data[pos] > border1 ? max1 : ~~(t1 * Math.log2(1 + data[pos]));
@@ -52,12 +70,13 @@ export function logTransform(
             break;
         }
         case 'CMYK': {
+            checkSize(times, 4);
             const [max1, max2, max3, max4] = COLOR_MAX[image.mode];
             const [t1, t2, t3, t4] = times;
-            const border1 = Math.pow(2, max1 / t1) - 1;
-            const border2 = Math.pow(2, max2 / t2) - 1;
-            const border3 = Math.pow(2, max3 / t3) - 1;
-            const border4 = Math.pow(2, max4 / t4) - 1;
+            const border1 = getBorder(max1, t1);
+            const border2 = getBorder(max2, t2);
+            const border3 = getBorder(max3, t3);
+            const border4 = getBorder(max4, t4);
             image.modifyData(data => {
                 for (let pos = 0; pos < size; pos += 4) {
                     data[pos] = data[pos] > border1 ? max1 : ~~(t1 * Math.log2(1 + data[pos]));

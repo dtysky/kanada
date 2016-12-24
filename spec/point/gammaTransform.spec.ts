@@ -6,17 +6,17 @@
 
 import {ImageCore} from '../../src/core';
 import {COLOR_SPACES, TColorSpace} from '../../src/constants';
-import {logTransform} from '../../src/point';
+import {gammaTransform} from '../../src/point';
 import * as TD from './imageData.testcase';
 
-describe('LogTransform', () => {
+describe('GammaTransform', () => {
     describe('failed with size:', () => {
         for (const color of COLOR_SPACES) {
             it(color, () => {
                 const image = new ImageCore();
-                image.fromBuffer([20, 20], TD.LOGT20x20[`${color}_O`], <TColorSpace>color);
+                image.fromBuffer([20, 20], TD.GT20x20[`${color}_O`], <TColorSpace>color);
                 try {
-                    logTransform(image, []);
+                    gammaTransform(image, [], []);
                 } catch (err) {
                     expect(err.name).toEqual('ArraySizeError');
                 }
@@ -28,15 +28,15 @@ describe('LogTransform', () => {
         for (const color of COLOR_SPACES) {
             it(color, () => {
                 const image = new ImageCore();
-                image.fromBuffer([20, 20], TD.LOGT20x20[`${color}_O`], <TColorSpace>color);
-                expect(logTransform(image, TD.LOGT20x20[`${color}_T`])).toEqual(jasmine.any(ImageCore));
-                expect(image.data).toEqual(TD.LOGT20x20[`${color}_R`]);
+                image.fromBuffer([20, 20], TD.GT20x20[`${color}_O`], <TColorSpace>color);
+                expect(gammaTransform(image, TD.GT20x20[`${color}_T`], TD.GT20x20[`${color}_G`])).toEqual(jasmine.any(ImageCore));
+                expect(image.data).toEqual(TD.GT20x20[`${color}_R`]);
                 expect(image.mode).toEqual(color);
             });
         }
     });
 
-    describe('test for performance:', () => {
+    fdescribe('test for performance:', () => {
         for (const color of COLOR_SPACES) {
             it(color, done => {
                 const image = new ImageCore();
@@ -45,7 +45,7 @@ describe('LogTransform', () => {
                     .then(img => {
                         img.changeMode(<TColorSpace>color);
                         const s = performance.now();
-                        logTransform(img, TD.LOGT20x20[`${color}_T`]);
+                        gammaTransform(img, TD.GT20x20[`${color}_T`], TD.GT20x20[`${color}_G`]);
                         // tslint:disable-next-line
                         console.log('Performance, linearTransform', color, img.size, img.mode, 'time(ms)', (performance.now() - s));
                         done();

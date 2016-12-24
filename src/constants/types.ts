@@ -27,6 +27,11 @@ export type TColorTrans =
     | 'Gamma';
 
 /**
+ * Type of size, it should be integer.
+ */
+export type TSize = number;
+
+/**
  * Type of image's size, it should be [width, height].
  */
 export type TImageSize = [number, number];
