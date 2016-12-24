@@ -185,3 +185,14 @@ export namespace GT20x20 {
     export const HSL_O = GT20x20.HSV_O;
     export const HSL_R = GT20x20.HSV_R;
 }
+
+// globalThreshold
+export namespace GTH20x20 {
+    export const ORG = genSamePointsBuffer([20, 20], [150, 100, 50, 200]);
+
+    export const WHITE_TH = 100;
+    export const WHITE_R = genSamePointsBuffer([20, 20], [255, 100, 50, 200]);
+
+    export const BLACK_TH = 200;
+    export const BLACK_R = genSamePointsBuffer([20, 20], [0, 100, 50, 200]);
+}

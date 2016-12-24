@@ -10,3 +10,4 @@ export * from './colorInvert';
 export * from './linearTransform';
 export * from './logTransform';
 export * from './gammaTransform';
+export * from './globalThreshold';

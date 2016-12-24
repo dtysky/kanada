@@ -36,7 +36,7 @@ describe('GammaTransform', () => {
         }
     });
 
-    fdescribe('test for performance:', () => {
+    describe('test for performance:', () => {
         for (const color of COLOR_SPACES) {
             it(color, done => {
                 const image = new ImageCore();
@@ -54,5 +54,3 @@ describe('GammaTransform', () => {
         }
     });
 });
-
-
