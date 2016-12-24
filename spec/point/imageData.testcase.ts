@@ -191,8 +191,10 @@ export namespace GTH20x20 {
     export const ORG = genSamePointsBuffer([20, 20], [150, 100, 50, 200]);
 
     export const WHITE_TH = 100;
+    export const WHITE_TH2 = 200;
     export const WHITE_R = genSamePointsBuffer([20, 20], [255, 100, 50, 200]);
 
     export const BLACK_TH = 200;
+    export const BLACK_TH2 = 250;
     export const BLACK_R = genSamePointsBuffer([20, 20], [0, 100, 50, 200]);
 }

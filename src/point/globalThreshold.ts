@@ -9,17 +9,26 @@ import {TChannel, COLOR_MAX} from '../constants';
 
 export function globalThreshold(
     image: ImageCore,
-    th: TChannel
+    th: TChannel,
+    th2?: TChannel
 ): ImageCore {
     if (image.mode !== 'L') {
         throw new Exceptions.ColorSpaceError('the mode of image to be converted to binary image', image.mode, 'L');
     }
     const size = image.data.length;
     const max = COLOR_MAX[image.mode][0];
-    image.modifyData(data => {
-        for (let pos = 0; pos < size; pos += 4) {
-            data[pos] = data[pos] >= th ? max : 0;
-        }
-    });
+    if (th2) {
+        image.modifyData(data => {
+            for (let pos = 0; pos < size; pos += 4) {
+                data[pos] = data[pos] <= th || data[pos] >= th2 ? 0 : max;
+            }
+        });
+    } else {
+        image.modifyData(data => {
+            for (let pos = 0; pos < size; pos += 4) {
+                data[pos] = data[pos] >= th ? max : 0;
+            }
+        });
+    }
     return image.changeMode('B');
 }
