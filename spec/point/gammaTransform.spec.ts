@@ -1,7 +1,7 @@
 /**
  * Copyright(c) dtysky<dtysky@outlook.com>
  * Created: 16/12/24
- * Description: testing for point/logTransform
+ * Description: testing for point/logTransform.
  */
 
 import {ImageCore} from '../../src/core';
@@ -47,7 +47,7 @@ describe('GammaTransform', () => {
                         const s = performance.now();
                         gammaTransform(img, TD.GT20x20[`${color}_T`], TD.GT20x20[`${color}_G`]);
                         // tslint:disable-next-line
-                        console.log('Performance, linearTransform', color, img.size, img.mode, 'time(ms)', (performance.now() - s));
+                        console.log('Performance, GammaTransform', color, img.size, img.mode, 'time(ms)', (performance.now() - s));
                         done();
                     });
             });

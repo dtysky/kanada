@@ -17,3 +17,31 @@ export function genSamePointsBuffer(
     }
     return buffer;
 }
+
+function getRndColor() {
+    const result = new Uint8ClampedArray(4);
+    crypto.getRandomValues(result);
+    return `rgba(${result.join(',')})`;
+}
+
+export function genRandomPointsContext(
+    size: TImageSize
+): CanvasRenderingContext2D {
+    const canvas = document.createElement('canvas');
+    canvas.width = size[0];
+    canvas.height = size[1];
+    const context = canvas.getContext('2d');
+    for (let y = 0; y < size[1]; y += 1) {
+        for (let x = 0; x < size[0]; x += 1) {
+            context.fillStyle = getRndColor();
+            context.fillRect(x, y, 1, 1);
+        }
+    }
+    return context;
+}
+
+export function getBufferFromContext(
+    context: CanvasRenderingContext2D
+): TBuffer {
+    return new Uint8ClampedArray(context.getImageData(0, 0, 20, 20).data);
+}

@@ -65,3 +65,16 @@ export type TPoint = [TPosition, TPixel];
  * Type of image buffer, it will be an Uint8ClampedArray, like [r1, b1, g1, a1, r2, g2, b2, a2...]
  */
 export type TBuffer = Uint8ClampedArray;
+
+/**
+ * Type of image buffer, it will be an Uint8ClampedArray, like [r1, b1, g1, a1, r2, g2, b2, a2...]
+ */
+export type TClipMode =
+    'ARC'
+    | 'ELLIPSE'
+    | 'RECT';
+
+/**
+ * Type of image buffer, it will be an Uint8ClampedArray, like [r1, b1, g1, a1, r2, g2, b2, a2...]
+ */
+export type TClipPath = number[];

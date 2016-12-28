@@ -47,7 +47,7 @@ describe('LogTransform', () => {
                         const s = performance.now();
                         logTransform(img, TD.LOGT20x20[`${color}_T`]);
                         // tslint:disable-next-line
-                        console.log('Performance, linearTransform', color, img.size, img.mode, 'time(ms)', (performance.now() - s));
+                        console.log('Performance, LogTransform', color, img.size, img.mode, 'time(ms)', (performance.now() - s));
                         done();
                     });
             });

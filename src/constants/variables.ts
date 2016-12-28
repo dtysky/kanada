@@ -67,3 +67,19 @@ export enum EColorTrans {
     'Log',
     'Gamma'
 }
+
+/**
+ * Modes of clip transformation.
+ */
+export enum EClipModes {
+    'ARC',
+    'ELLIPSE',
+    'RECT'
+}
+
+/**
+ * Collection of clip transformations (Array).
+ */
+export const CLIP_MODES = Object.keys(EClipModes).filter(
+    mode => !(parseInt(mode, 10) >= 0)
+);

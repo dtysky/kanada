@@ -33,7 +33,7 @@ describe('LinearTransform', () => {
                         const s = performance.now();
                         linearTransform(img, TD.LT20x20[`${color}_G`]);
                         // tslint:disable-next-line
-                        console.log('Performance, linearTransform', color, img.size, img.mode, 'time(ms)', (performance.now() - s));
+                        console.log('Performance, LinearTransform', color, img.size, img.mode, 'time(ms)', (performance.now() - s));
                         done();
                     });
             });

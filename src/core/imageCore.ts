@@ -179,17 +179,21 @@ export class ImageCore {
         const rowSize = this._data.width - 1;
         let x = 0;
         let y = 0;
-        for (let pos = 0; pos < size; pos += 4) {
-            if (modify) {
+        if (modify) {
+            for (let pos = 0; pos < size; pos += 4) {
                 this._data.data.set(
                     pointOption(this._data.data.subarray(pos, pos + PIXEL_SIZE[this._mode]), [x, y]),
                     pos
                 );
-            } else {
-                pointOption(this._data.data.subarray(pos, pos + PIXEL_SIZE[this._mode]), [x, y]);
+                y = x === rowSize ? y + 1 : y;
+                x = x === rowSize ? 0 : x + 1;
             }
-            y = x === rowSize ? y + 1 : y;
-            x = x === rowSize ? 0 : x + 1;
+        } else {
+            for (let pos = 0; pos < size; pos += 4) {
+                pointOption(this._data.data.subarray(pos, pos + PIXEL_SIZE[this._mode]), [x, y]);
+                y = x === rowSize ? y + 1 : y;
+                x = x === rowSize ? 0 : x + 1;
+            }
         }
     }
 
