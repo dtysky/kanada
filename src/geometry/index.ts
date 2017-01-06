@@ -5,3 +5,4 @@
  */
 
 export * from './clip';
+export * from './translate';

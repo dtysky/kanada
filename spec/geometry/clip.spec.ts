@@ -21,7 +21,7 @@ describe('Clip', () => {
         }
     });
 
-    fdescribe('test for performance:', () => {
+    describe('test for performance:', () => {
         for (const mode of CLIP_MODES) {
             it(mode, done => {
                 const image = new ImageCore();
@@ -38,4 +38,3 @@ describe('Clip', () => {
         }
     });
 });
-

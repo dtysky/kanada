@@ -34,7 +34,7 @@ export type TSize = number;
 /**
  * Type of image's size, it should be [width, height].
  */
-export type TImageSize = [number, number];
+export type TImageSize = [TSize, TSize];
 
 /**
  * Type of color channel, it will be r, g, b...etc.

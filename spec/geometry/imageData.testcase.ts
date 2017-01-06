@@ -5,6 +5,7 @@
  */
 
 import {genRandomPointsContext, getBufferFromContext} from '../utils';
+import {TPosition} from '../../src/constants';
 
 // clip
 export namespace CLIP200x200 {
@@ -25,4 +26,13 @@ export namespace CLIP200x200 {
     export const RECT_P = [50, 50, 100, 100];
     context.rect.apply(context, RECT_P);
     export const RECT_R = getBufferFromContext(context);
+}
+
+// translate
+export namespace TS200x200 {
+    const context = genRandomPointsContext([200, 200]);
+    export const O = getBufferFromContext(context);
+    export const T: TPosition = [70, 139];
+    context.translate(T[0], T[1]);
+    export const R = getBufferFromContext(context);
 }
