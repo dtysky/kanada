@@ -1,28 +1,28 @@
 /**
  * Copyright(c) dtysky<dtysky@outlook.com>
- * Created: 16/12/31
- * Description: moving the origin of image, this method equals to `CanvasRenderingContext2D.translate`.
+ * Created: 26 Dec 2017
+ * Description: Shear an image by given factors.
  */
 import {ImageCore} from '../core';
 import {TPosition, TPixel} from '../constants';
 import geometryBaseOperate from './base';
 
-export default function translate(
+export default function shear(
     image: ImageCore,
-    offset: TPosition,
+    factors: TPosition,
     background: TPixel = [0, 0, 0, 0]
 ): ImageCore {
     return geometryBaseOperate(
         image,
-        offset,
+        factors,
         background,
         (attributes: any) => ({
-            offX: ~~attributes[0],
-            offY: ~~attributes[1]
+            fX: attributes[0],
+            fY: attributes[1]
         }),
         (newX: number, newY: number, args: any) => ({
-            oldX: newX - args.offX,
-            oldY: newY - args.offY
+            oldX: ~~(newX / args.fX) - newY,
+            oldY: ~~(newY / args.fY) - newX
         })
     );
 }

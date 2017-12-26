@@ -7,7 +7,7 @@ import {ImageCore} from '../../src/core';
 import {translate} from '../../src/geometry';
 import * as TD from './imageData.testcase';
 
-fdescribe('Translate', () => {
+describe('Translate', () => {
     it('Base', () => {
         const image = new ImageCore();
         image.fromBuffer([20, 20], TD.TS200x200.O);

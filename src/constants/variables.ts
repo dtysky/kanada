@@ -8,15 +8,15 @@
  * Collection of color spaces.
  */
 export enum EColorSpaces {
-    'RGB',
-    'BGR',
-    'RGBA',
-    'BGRA',
-    'L',
-    'B',
-    'CMYK',
-    'HSL',
-    'HSV'
+    'RGB' = 'RGB',
+    'BGR' = 'BGR',
+    'RGBA' = 'RGBA',
+    'BGRA' = 'BGRA',
+    'L' = 'L',
+    'B' = 'B',
+    'CMYK' = 'CMYK',
+    'HSL' = 'HSL',
+    'HSV' = 'HSV'
 }
 
 /**

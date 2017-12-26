@@ -137,20 +137,6 @@ describe('ImageCore', () => {
         expect(image.dataIsModified).toBeTruthy();
     });
 
-    it('modifyContext, modify context with given option:', () => {
-        const image = new ImageCore();
-        image.fromBuffer([20, 20], white20x20);
-        image.dataIsModified = true;
-        expect(image.modifyContext((context, size) => {
-            expect(size).toEqual([20, 20]);
-            const data = new ImageData(20, 20);
-            data.data.set(black20x20, 0);
-            context.putImageData(data, 0, 0);
-        })).toEqual(jasmine.any(ImageCore));
-        expect(image.data).toEqual(black20x20);
-        expect(image.dataIsModified).toBeFalsy();
-    });
-
     it('forEach, handling points with given option:', () => {
         const image = new ImageCore();
         image.fromBuffer([20, 20], white20x20);

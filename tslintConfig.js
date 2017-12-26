@@ -5,12 +5,12 @@
  */
 
 const fs = require('fs');
-
+const path = require('path');
 
 module.exports = {
   configuration: {
-    rulesDirectory: 'node_modules/tslint-microsoft-contrib',
-    configuration: JSON.parse(fs.readSync('tslint.json'))
+    rulesDirectory: './tslint-contrib',
+    configuration: JSON.parse(fs.readFileSync(path.resolve(__dirname, 'tslint.json')))
   },
 
   // enables type checked rules like 'for-in-array'

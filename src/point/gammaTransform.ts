@@ -34,9 +34,11 @@ function getBorder(
  */
 export function gammaTransform(
     image: ImageCore,
-    times: number[],
-    gammas: number[]
+    times: number[] | number,
+    gammas: number[] | number
 ): ImageCore {
+    times = typeof times === 'number' ? [times, times, times] : times;
+    gammas = typeof gammas === 'number' ? [gammas, gammas, gammas] : gammas;
     const size = image.data.length;
     switch (image.mode) {
         case 'RGB':

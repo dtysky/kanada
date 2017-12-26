@@ -10,8 +10,9 @@ import {
 } from '../constants';
 import {Exceptions} from './exceptions';
 
-export class ImageCore {
+export default class ImageCore {
     private _mode: TColorSpace;
+    private _canvas: HTMLCanvasElement;
     private _context: CanvasRenderingContext2D;
     private _data: ImageData;
     // a flag for push back data to context lazily
@@ -21,13 +22,22 @@ export class ImageCore {
         mode: TColorSpace = <TColorSpace>'RGBA'
     ) {
         this._mode = mode;
-        this._context = document.createElement('canvas').getContext('2d');
+        this._canvas = document.createElement('canvas');
+        this._context = this._canvas.getContext('2d');
         this._data = new ImageData(1, 1);
         this.dataIsModified = false;
     }
 
     public get mode(): TColorSpace {
         return this._mode;
+    }
+
+    public get width(): number {
+        return this._data.width;
+    }
+
+    public get height(): number {
+        return this._data.height;
     }
 
     public get size(): TImageSize {
@@ -39,17 +49,22 @@ export class ImageCore {
         return new Uint8ClampedArray(this._data.data);
     }
 
+    public get dataURL(): string {
+        return this._canvas.toDataURL();
+    }
+
     public fromImage(
         image: HTMLImageElement
     ): ImageCore {
-        if (this._mode !== 'RGBA') {
-            throw new Exceptions.ColorSpaceError('the mode of image', this._mode, 'RGBA');
-        }
-        const canvas = document.createElement('canvas');
+        // if (this._mode !== 'RGBA') {
+        //     throw new Exceptions.ColorSpaceError('the mode of image', this._mode, 'RGBA');
+        // }
+        const canvas = this._canvas;
         canvas.width = image.width;
         canvas.height = image.height;
         const context = canvas.getContext('2d');
-        context.drawImage(image, 0, 0, image.width, image.height);
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
         this._context = context;
         this._data = context.getImageData(0, 0, image.width, image.height);
         return this;
@@ -63,16 +78,30 @@ export class ImageCore {
         if (size[0] * size[1] * 4 !== buffer.length) {
             throw new Exceptions.BufferSizeError(buffer.length, size[0] * size[1] * 4);
         }
-        const canvas = document.createElement('canvas');
+        const canvas = this._canvas;
         canvas.width = size[0];
         canvas.height = size[1];
         const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
         this._data = context.getImageData(0, 0, canvas.width, canvas.height);
         this._data.data.set(buffer, 0);
         context.putImageData(this._data, 0, 0);
         this._context = context;
         this._mode = mode || this._mode;
         return this;
+    }
+
+    public fromUrl(
+        url: string
+    ): Promise<ImageCore> {
+        // if (this._mode !== 'RGBA') {
+        //     return new Promise((resolve, reject) =>
+        //         reject(new Exceptions.ColorSpaceError('the mode of image', this._mode, 'RGBA'))
+        //     );
+        // }
+        return Environments.BROWSER_MODE
+            ? this._getDataInBrowser(url)
+            : this._getDataInNode(url);
     }
 
     private _getDataInBrowser(
@@ -97,19 +126,6 @@ export class ImageCore {
         return new Promise((resolve, reject) => resolve());
     }
 
-    public fromUrl(
-        url: string
-    ): Promise<ImageCore> {
-        if (this._mode !== 'RGBA') {
-            return new Promise((resolve, reject) =>
-                reject(new Exceptions.ColorSpaceError('the mode of image', this._mode, 'RGBA'))
-            );
-        }
-        return Environments.BROWSER_MODE
-            ? this._getDataInBrowser(url)
-            : this._getDataInNode(url);
-    }
-
     public copy(
         image: ImageCore
     ): ImageCore {
@@ -130,26 +146,26 @@ export class ImageCore {
     }
 
     public pushDataBackToContext() {
+        if (this._mode === 'L' || this._mode === 'B') {
+            this.modifyData((data, size, length) => {
+                for (let pos = 0; pos < length; pos += 4) {
+                    data[pos + 1] = data[pos];
+                    data[pos + 2] = data[pos];
+                }
+            });
+        }
         this._context.putImageData(this._data, 0, 0);
         this.dataIsModified = false;
     }
 
     public modifyData(
-        imageOption: (data: Uint8ClampedArray, size: TImageSize) => void
+        imageOption: (data: Uint8ClampedArray, size: TImageSize, length: number) => void | Uint8ClampedArray
     ): ImageCore {
-        imageOption(this._data.data, this.size);
-        this.dataIsModified = true;
-        return this;
-    }
-
-    public modifyContext(
-        contextOption: (context: CanvasRenderingContext2D, size: TImageSize) => void
-    ): ImageCore {
-        if (this.dataIsModified) {
-            this.pushDataBackToContext();
+        const data = imageOption(this._data.data, this.size, this._data.data.length);
+        if (data) {
+            this._data.data.set(data);
         }
-        contextOption(this._context, this.size);
-        this._data = this._context.getImageData(0, 0, this.size[0], this.size[1]);
+        this.dataIsModified = true;
         return this;
     }
 
@@ -171,18 +187,22 @@ export class ImageCore {
         return this._data.data.subarray(start, start + PIXEL_SIZE[this._mode]);
     }
 
-    private _loopWithPoints(
-        pointOption: (pixel: TPixel, position: TPosition) => TPixel | void,
-        modify: boolean = false
+    private _loopWithPoints(option: {
+            pointOption: (pixel: TPixel, position: TPosition) => TPixel,
+            kind: 'map'
+        } | {
+            pointOption: (pixel: TPixel, position: TPosition) => void,
+            kind: 'forEach'
+        }
     ) : void {
         const size = this.data.length;
         const rowSize = this._data.width - 1;
         let x = 0;
         let y = 0;
-        if (modify) {
+        if (option.kind === 'map') {
             for (let pos = 0; pos < size; pos += 4) {
                 this._data.data.set(
-                    pointOption(this._data.data.subarray(pos, pos + PIXEL_SIZE[this._mode]), [x, y]),
+                    option.pointOption(this._data.data.subarray(pos, pos + PIXEL_SIZE[this._mode]), [x, y]),
                     pos
                 );
                 y = x === rowSize ? y + 1 : y;
@@ -190,7 +210,7 @@ export class ImageCore {
             }
         } else {
             for (let pos = 0; pos < size; pos += 4) {
-                pointOption(this._data.data.subarray(pos, pos + PIXEL_SIZE[this._mode]), [x, y]);
+                option.pointOption(this._data.data.subarray(pos, pos + PIXEL_SIZE[this._mode]), [x, y]);
                 y = x === rowSize ? y + 1 : y;
                 x = x === rowSize ? 0 : x + 1;
             }
@@ -200,7 +220,7 @@ export class ImageCore {
     public map(
         pointOption: (pixel: TPixel, position: TPosition) => TPixel
     ) : ImageCore {
-        this._loopWithPoints(pointOption, true);
+        this._loopWithPoints({pointOption, kind: 'map'});
         this.dataIsModified = true;
         return this;
     }
@@ -208,7 +228,7 @@ export class ImageCore {
     public forEach(
         pointOption: (ppixel: TPixel, position: TPosition) => void
     ) : ImageCore {
-        this._loopWithPoints(pointOption);
+        this._loopWithPoints({pointOption, kind: 'forEach'});
         return this;
     }
 }

@@ -43,5 +43,7 @@ export function genRandomPointsContext(
 export function getBufferFromContext(
     context: CanvasRenderingContext2D
 ): TBuffer {
-    return new Uint8ClampedArray(context.getImageData(0, 0, 20, 20).data);
+    return new Uint8ClampedArray(
+        context.getImageData(0, 0, context.canvas.width, context.canvas.height
+        ).data);
 }

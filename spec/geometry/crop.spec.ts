@@ -6,7 +6,7 @@
 
 import {ImageCore} from '../../src/core';
 import {CLIP_MODES, TClipMode} from '../../src/constants';
-import {clip} from '../../src/geometry';
+import {crop} from '../../src/geometry';
 import * as TD from './imageData.testcase';
 
 describe('Clip', () => {
@@ -15,8 +15,10 @@ describe('Clip', () => {
             it(mode, () => {
                 const image = new ImageCore();
                 image.fromBuffer([20, 20], TD.CLIP200x200[`${mode}_O`]);
+                // console.log(image.data);
                 expect(clip(image, <TClipMode>mode, TD.CLIP200x200[`${mode}_P`])).toEqual(jasmine.any(ImageCore));
                 expect(image.data).toEqual(TD.CLIP200x200[`${mode}_R`]);
+                // console.log(image.data);
             });
         }
     });

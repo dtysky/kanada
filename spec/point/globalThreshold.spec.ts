@@ -50,7 +50,7 @@ describe('GlobalThreshold', () => {
     });
 
     describe('test for performance:', () => {
-        it ('Base', done => {
+        fit ('Base', done => {
             const image = new ImageCore();
             const url = '/base/testImages/rgba.png';
             image.fromUrl(url)

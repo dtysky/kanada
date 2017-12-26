@@ -5,4 +5,4 @@
  */
 
 export * from './exceptions';
-export * from './imageCore';
+export {default as ImageCore} from './ImageCore';
