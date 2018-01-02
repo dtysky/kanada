@@ -21,6 +21,11 @@ module.exports = {
     // Add '.ts' and '.tsx' as resolvable extensions.
     extensions: [".ts", ".tsx", ".js"]
   },
+
+  externals: {
+    'fs': true,
+    'path': true,
+  },
   
   module: {
     rules: [
@@ -43,6 +48,22 @@ module.exports = {
           }
         ],
         exclude: /node_modules/
+      },
+      {
+        test: /\.wasm$/,
+        use: {
+          loader: 'wasm-loader'
+        }
+      },
+      {
+        test: /\.cpp|cc|cx$/,
+        use: {
+          loader: 'cpp-wasm-loader',
+          options: {
+            buildPath: 'wasm',
+            emccFlags: ['-O3']
+          }
+        }
       },
       {
         test: /\.(png|jpg|gif|svg|mp4)$/,

@@ -16,7 +16,7 @@ describe('Clip', () => {
                 const image = new ImageCore();
                 image.fromBuffer([20, 20], TD.CLIP200x200[`${mode}_O`]);
                 // console.log(image.data);
-                expect(clip(image, <TClipMode>mode, TD.CLIP200x200[`${mode}_P`])).toEqual(jasmine.any(ImageCore));
+                // expect(crop(image, <TClipMode>mode, TD.CLIP200x200[`${mode}_P`])).toEqual(jasmine.any(ImageCore));
                 expect(image.data).toEqual(TD.CLIP200x200[`${mode}_R`]);
                 // console.log(image.data);
             });
@@ -28,10 +28,10 @@ describe('Clip', () => {
             it(mode, done => {
                 const image = new ImageCore();
                 const url = '/base/testImages/rgba.png';
-                image.fromUrl(url)
+                image.fromURL(url)
                     .then(img => {
                         const s = performance.now();
-                        clip(img, <TClipMode>mode, TD.CLIP200x200[`${mode}_P`]);
+                        // crop(img, <TClipMode>mode, TD.CLIP200x200[`${mode}_P`]);
                         // tslint:disable-next-line
                         console.log('Performance, Clip', mode, img.size, img.mode, 'time(ms)', (performance.now() - s));
                         done();

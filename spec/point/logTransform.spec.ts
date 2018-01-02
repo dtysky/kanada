@@ -16,7 +16,7 @@ describe('LogTransform', () => {
                 const image = new ImageCore();
                 image.fromBuffer([20, 20], TD.LOGT20x20[`${color}_O`], <TColorSpace>color);
                 try {
-                    logTransform(image, []);
+                    logTransform([])(image);
                 } catch (err) {
                     expect(err.name).toEqual('ArraySizeError');
                 }
@@ -29,7 +29,7 @@ describe('LogTransform', () => {
             it(color, () => {
                 const image = new ImageCore();
                 image.fromBuffer([20, 20], TD.LOGT20x20[`${color}_O`], <TColorSpace>color);
-                expect(logTransform(image, TD.LOGT20x20[`${color}_T`])).toEqual(jasmine.any(ImageCore));
+                expect(logTransform(TD.LOGT20x20[`${color}_T`])(image)).toEqual(jasmine.any(ImageCore));
                 expect(image.data).toEqual(TD.LOGT20x20[`${color}_R`]);
                 expect(image.mode).toEqual(color);
             });
@@ -41,11 +41,11 @@ describe('LogTransform', () => {
             it(color, done => {
                 const image = new ImageCore();
                 const url = '/base/testImages/rgba.png';
-                image.fromUrl(url)
+                image.fromURL(url)
                     .then(img => {
                         img.changeMode(<TColorSpace>color);
                         const s = performance.now();
-                        logTransform(img, TD.LOGT20x20[`${color}_T`]);
+                        logTransform(TD.LOGT20x20[`${color}_T`])(img);
                         // tslint:disable-next-line
                         console.log('Performance, LogTransform', color, img.size, img.mode, 'time(ms)', (performance.now() - s));
                         done();

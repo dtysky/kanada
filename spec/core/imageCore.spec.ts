@@ -22,7 +22,7 @@ describe('ImageCore', () => {
         it ('failed with type', () => {
             const image = new ImageCore('RGB');
             try {
-                image.fromImage(new Image());
+                image.fromElement(new Image());
             } catch (err) {
                 expect(err.name).toEqual('ColorSpaceError');
             }
@@ -31,7 +31,7 @@ describe('ImageCore', () => {
             const img = new Image();
             img.onload = () => {
                 const image = new ImageCore();
-                expect(image.fromImage(img)).toEqual(jasmine.any(ImageCore));
+                expect(image.fromElement(img)).toEqual(jasmine.any(ImageCore));
                 expect(image.size).toEqual([20, 20]);
                 expect(image.data).toEqual(white20x20);
                 done();
@@ -40,10 +40,10 @@ describe('ImageCore', () => {
         });
     });
 
-    describe('fromUrl, creating image data from url:', () => {
+    describe('fromURL, creating image data from url:', () => {
         it ('failed with type', done => {
             const image = new ImageCore('RGB');
-            image.fromUrl('')
+            image.fromURL('')
                 .catch(err => {
                     expect(err.name).toEqual('ColorSpaceError');
                     done();
@@ -51,7 +51,7 @@ describe('ImageCore', () => {
         });
         it ('failed with path', done => {
             const image = new ImageCore();
-            image.fromUrl('')
+            image.fromURL('')
                 .catch(err => {
                     expect(err.name).toEqual('InvalidImagePathError');
                     done();
@@ -60,7 +60,7 @@ describe('ImageCore', () => {
         it('successful', done => {
             const image = new ImageCore();
             const url = '/base/testImages/white.png';
-            image.fromUrl(url)
+            image.fromURL(url)
                 .then(img => {
                     expect(img.size).toEqual([20, 20]);
                     expect(img.data).toEqual(white20x20);
@@ -169,7 +169,7 @@ describe('ImageCore', () => {
         it('modifyData, modify data with given option:', done => {
             const image = new ImageCore();
             const url = '/base/testImages/rgba.png';
-            image.fromUrl(url)
+            image.fromURL(url)
                 .then(img => {
                     const s = performance.now();
                     img.modifyData((data, size) => {
@@ -187,7 +187,7 @@ describe('ImageCore', () => {
         it ('forEach', done => {
             const image = new ImageCore();
             const url = '/base/testImages/rgba.png';
-            image.fromUrl(url)
+            image.fromURL(url)
                 .then(img => {
                     let s = performance.now();
                     img.forEach(() => []);
@@ -205,7 +205,7 @@ describe('ImageCore', () => {
         it ('map', done => {
             const image = new ImageCore();
             const url = '/base/testImages/rgba.png';
-            image.fromUrl(url)
+            image.fromURL(url)
                 .then(img => {
                     let s = performance.now();
                     img.map((pixel, position)  => [0, 0, 0, 255]);

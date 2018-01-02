@@ -16,7 +16,7 @@ describe('GammaTransform', () => {
                 const image = new ImageCore();
                 image.fromBuffer([20, 20], TD.GT20x20[`${color}_O`], <TColorSpace>color);
                 try {
-                    gammaTransform(image, [], []);
+                    gammaTransform([], [])(image);
                 } catch (err) {
                     expect(err.name).toEqual('ArraySizeError');
                 }
@@ -29,7 +29,7 @@ describe('GammaTransform', () => {
             it(color, () => {
                 const image = new ImageCore();
                 image.fromBuffer([20, 20], TD.GT20x20[`${color}_O`], <TColorSpace>color);
-                expect(gammaTransform(image, TD.GT20x20[`${color}_T`], TD.GT20x20[`${color}_G`])).toEqual(jasmine.any(ImageCore));
+                expect(gammaTransform(TD.GT20x20[`${color}_T`], TD.GT20x20[`${color}_G`])(image)).toEqual(jasmine.any(ImageCore));
                 expect(image.data).toEqual(TD.GT20x20[`${color}_R`]);
                 expect(image.mode).toEqual(color);
             });
@@ -41,11 +41,11 @@ describe('GammaTransform', () => {
             it(color, done => {
                 const image = new ImageCore();
                 const url = '/base/testImages/rgba.png';
-                image.fromUrl(url)
+                image.fromURL(url)
                     .then(img => {
                         img.changeMode(<TColorSpace>color);
                         const s = performance.now();
-                        gammaTransform(img, TD.GT20x20[`${color}_T`], TD.GT20x20[`${color}_G`]);
+                        gammaTransform(TD.GT20x20[`${color}_T`], TD.GT20x20[`${color}_G`])(img);
                         // tslint:disable-next-line
                         console.log('Performance, GammaTransform', color, img.size, img.mode, 'time(ms)', (performance.now() - s));
                         done();

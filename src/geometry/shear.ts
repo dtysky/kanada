@@ -7,13 +7,11 @@ import {ImageCore} from '../core';
 import {TPosition, TPixel} from '../constants';
 import geometryBaseOperate from './base';
 
-export default function shear(
-    image: ImageCore,
+export function shear (
     factors: TPosition,
-    background: TPixel = [0, 0, 0, 0]
-): ImageCore {
+    background?: TPixel
+) {
     return geometryBaseOperate(
-        image,
         factors,
         background,
         (attributes: any) => ({

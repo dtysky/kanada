@@ -6,11 +6,10 @@
 import {Exceptions, ImageCore} from '../core';
 import {TChannel, COLOR_MAX} from '../constants';
 
-export function globalThreshold(
-    image: ImageCore,
+export const globalThreshold = (
     th: TChannel,
     th2?: TChannel
-): ImageCore {
+) => (image: ImageCore) => {
     const size = image.data.length;
     const max = COLOR_MAX[image.mode][0];
     if (th2) {
@@ -38,4 +37,4 @@ export function globalThreshold(
         image.changeMode('B');
     }
     return image;
-}
+};

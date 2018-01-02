@@ -12,7 +12,7 @@ describe('GlobalThreshold', () => {
     it('failed with type', () => {
         const image = new ImageCore();
         try {
-            globalThreshold(image, 100);
+            globalThreshold(100)(image);
         } catch (err) {
             expect(err.name).toEqual('ColorSpaceError');
         }
@@ -22,28 +22,28 @@ describe('GlobalThreshold', () => {
         it('Base, White', () => {
             const image = new ImageCore();
             image.fromBuffer([20, 20], TD.GTH20x20.ORG, 'L');
-            expect(globalThreshold(image, TD.GTH20x20.WHITE_TH)).toEqual(jasmine.any(ImageCore));
+            expect(globalThreshold(TD.GTH20x20.WHITE_TH)(image)).toEqual(jasmine.any(ImageCore));
             expect(image.data).toEqual(TD.GTH20x20.WHITE_R);
             expect(image.mode).toEqual('B');
         });
         it('Base, Black', () => {
             const image = new ImageCore();
             image.fromBuffer([20, 20], TD.GTH20x20.ORG, 'L');
-            expect(globalThreshold(image, TD.GTH20x20.BLACK_TH)).toEqual(jasmine.any(ImageCore));
+            expect(globalThreshold(TD.GTH20x20.BLACK_TH)(image)).toEqual(jasmine.any(ImageCore));
             expect(image.data).toEqual(TD.GTH20x20.BLACK_R);
             expect(image.mode).toEqual('B');
         });
         it('Contour, White', () => {
             const image = new ImageCore();
             image.fromBuffer([20, 20], TD.GTH20x20.ORG, 'L');
-            expect(globalThreshold(image, TD.GTH20x20.WHITE_TH, TD.GTH20x20.WHITE_TH2)).toEqual(jasmine.any(ImageCore));
+            expect(globalThreshold(TD.GTH20x20.WHITE_TH, TD.GTH20x20.WHITE_TH2)(image)).toEqual(jasmine.any(ImageCore));
             expect(image.data).toEqual(TD.GTH20x20.WHITE_R);
             expect(image.mode).toEqual('B');
         });
         it('Contour, Black', () => {
             const image = new ImageCore();
             image.fromBuffer([20, 20], TD.GTH20x20.ORG, 'L');
-            expect(globalThreshold(image, TD.GTH20x20.BLACK_TH, TD.GTH20x20.BLACK_TH2)).toEqual(jasmine.any(ImageCore));
+            expect(globalThreshold(TD.GTH20x20.BLACK_TH, TD.GTH20x20.BLACK_TH2)(image)).toEqual(jasmine.any(ImageCore));
             expect(image.data).toEqual(TD.GTH20x20.BLACK_R);
             expect(image.mode).toEqual('B');
         });
@@ -53,11 +53,11 @@ describe('GlobalThreshold', () => {
         fit ('Base', done => {
             const image = new ImageCore();
             const url = '/base/testImages/rgba.png';
-            image.fromUrl(url)
+            image.fromURL(url)
                 .then(img => {
                     img.changeMode('L');
                     const s = performance.now();
-                    globalThreshold(img, 100);
+                    globalThreshold(100)(img);
                     // tslint:disable-next-line
                     console.log('Performance, GlobalThreshold, Base', img.size, img.mode, 'time(ms)', (performance.now() - s));
                     done();
@@ -66,11 +66,11 @@ describe('GlobalThreshold', () => {
         it ('Contour', done => {
             const image = new ImageCore();
             const url = '/base/testImages/rgba.png';
-            image.fromUrl(url)
+            image.fromURL(url)
                 .then(img => {
                     img.changeMode('L');
                     const s = performance.now();
-                    globalThreshold(img, 100, 200);
+                    globalThreshold(100, 200)(img);
                     // tslint:disable-next-line
                     console.log('Performance, GlobalThreshold, Contour', img.size, img.mode, 'time(ms)', (performance.now() - s));
                     done();

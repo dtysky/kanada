@@ -7,13 +7,11 @@ import {ImageCore} from '../core';
 import {TPosition, TPixel} from '../constants';
 import geometryBaseOperate from './base';
 
-export default function translate(
-    image: ImageCore,
+export function translate (
     offset: TPosition,
-    background: TPixel = [0, 0, 0, 0]
-): ImageCore {
+    background?: TPixel
+) {
     return geometryBaseOperate(
-        image,
         offset,
         background,
         (attributes: any) => ({

@@ -24,10 +24,9 @@ function getRGBColorFromHSL(
         ) * max;
 }
 
-export function colorSpaceConvert(
-    image: ImageCore,
+export const colorSpaceConvert = (
     dstMode: TColorSpace
-): ImageCore {
+) => (image: ImageCore) => {
     const size = image.data.length;
 
     // No conversion needed
@@ -272,6 +271,8 @@ export function colorSpaceConvert(
                             data[pos] = (c + m) * rmax;
                             data[pos + 1] = m * gmax;
                             data[pos + 2] = (x + m) * bmax;
+                            continue;
+                        default:
                             continue;
                     }
                 }

@@ -7,10 +7,9 @@
 import {ImageCore} from '../core';
 import {COLOR_MAX, TChannel} from '../constants';
 
-export function linearTransform(
-    image: ImageCore,
+export const linearTransform = (
     gains: number[] | number
-): ImageCore {
+) => (image: ImageCore) => {
     gains = typeof gains === 'number' ? [gains, gains, gains] : gains;
     const size = image.data.length;
     switch (image.mode) {
@@ -67,4 +66,4 @@ export function linearTransform(
             break;
     }
     return image;
-}
+};

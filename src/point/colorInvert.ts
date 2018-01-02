@@ -7,9 +7,7 @@
 import {ImageCore} from '../core';
 import {COLOR_MAX} from '../constants';
 
-export function colorInvert(
-    image: ImageCore
-): ImageCore {
+export const colorInvert = () => (image: ImageCore) => {
     const size = image.data.length;
     switch (image.mode) {
         case 'RGB':

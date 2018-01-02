@@ -1,28 +1,28 @@
 /**
  * Copyright(c) dtysky<dtysky@outlook.com>
  * Created: 26 Dec 2017
- * Description: Crop an image by given border.
+ * Description: Crop an image by given TEdge.
  */
 import {ImageCore} from '../core';
-import {TPosition, TPixel} from '../constants';
+import {TPosition, TPixel, TEdge} from '../constants';
 import geometryBaseOperate from './base';
 
-export default function crop(
-    image: ImageCore,
-    factors: TPosition,
-    background: TPixel = [0, 0, 0, 0]
-): ImageCore {
+export function crop (
+    edge: TEdge,
+    background?: TPixel
+) {
     return geometryBaseOperate(
-        image,
-        factors,
+        edge,
         background,
         (attributes: any) => ({
-            fX: attributes[0],
-            fY: attributes[1]
+            left: attributes[0],
+            top: attributes[1],
+            right: attributes[2],
+            bottom: attributes[3]
         }),
         (newX: number, newY: number, args: any) => ({
-            oldX: ~~(newX / args.fX) - newY,
-            oldY: ~~(newY / args.fY) - newX
+            oldX: newX > args.right || newX < args.left ? -1 : newX,
+            oldY: newY > args.bottom || newY < args.top ? -1 : newY
         })
     );
 }

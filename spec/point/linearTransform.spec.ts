@@ -15,7 +15,7 @@ describe('LinearTransform', () => {
             it(color, () => {
                 const image = new ImageCore();
                 image.fromBuffer([20, 20], TD.LT20x20[`${color}_O`], <TColorSpace>color);
-                expect(linearTransform(image, TD.LT20x20[`${color}_G`])).toEqual(jasmine.any(ImageCore));
+                expect(linearTransform(TD.LT20x20[`${color}_G`])(image)).toEqual(jasmine.any(ImageCore));
                 expect(image.data).toEqual(TD.LT20x20[`${color}_R`]);
                 expect(image.mode).toEqual(color);
             });
@@ -27,11 +27,11 @@ describe('LinearTransform', () => {
             it(color, done => {
                 const image = new ImageCore();
                 const url = '/base/testImages/rgba.png';
-                image.fromUrl(url)
+                image.fromURL(url)
                     .then(img => {
                         img.changeMode(<TColorSpace>color);
                         const s = performance.now();
-                        linearTransform(img, TD.LT20x20[`${color}_G`]);
+                        linearTransform(TD.LT20x20[`${color}_G`])(img);
                         // tslint:disable-next-line
                         console.log('Performance, LinearTransform', color, img.size, img.mode, 'time(ms)', (performance.now() - s));
                         done();

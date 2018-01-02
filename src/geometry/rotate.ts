@@ -8,21 +8,19 @@ import {ImageCore} from '../core';
 import {TPosition, TPixel} from '../constants';
 import geometryBaseOperate from './base';
 
-export default function rotate(
-    image: ImageCore,
+export function rotate (
     angle: number,
     anchor: TPosition = [0, 0],
-    background: TPixel = [0, 0, 0, 0]
-): ImageCore {
+    background?: TPixel
+) {
     return geometryBaseOperate(
-        image,
-        {anchor, angle},
+        {anchor,angle},
         background,
         (attributes: any) => ({
             anchorX: ~~attributes.anchor[0],
             anchorY: ~~attributes.anchor[1],
-            sina: Math.sin(angle),
-            cosa: Math.cos(angle)
+            sina: Math.sin(attributes.angle),
+            cosa: Math.cos(attributes.angle)
         }),
         (newX: number, newY: number, args: any) =>{
             const {anchorX, anchorY, sina, cosa} = args;

@@ -12,7 +12,7 @@ describe('ColorSpaceConvert', () => {
     it('failed with type', () => {
         const image = new ImageCore('HSL');
         try {
-            colorSpaceConvert(image, 'HSV');
+            colorSpaceConvert('HSV')(image);
         } catch (err) {
             expect(err.name).toEqual('ColorSpaceError');
         }
@@ -21,13 +21,13 @@ describe('ColorSpaceConvert', () => {
     it('failed with type L or B', () => {
         let image = new ImageCore('RGBA');
         try {
-            colorSpaceConvert(image, 'L');
+            colorSpaceConvert('L')(image);
         } catch (err) {
             expect(err.name).toEqual('ColorSpaceError');
         }
         image = new ImageCore('RGBA');
         try {
-            colorSpaceConvert(image, 'B');
+            colorSpaceConvert('B')(image);
         } catch (err) {
             expect(err.name).toEqual('ColorSpaceError');
         }
@@ -37,35 +37,35 @@ describe('ColorSpaceConvert', () => {
         it('RGBA to RGBA', () => {
             const image = new ImageCore();
             image.fromBuffer([20, 20], TD.cscRgba20x20);
-            expect(colorSpaceConvert(image, 'RGBA')).toEqual(jasmine.any(ImageCore));
+            expect(colorSpaceConvert('RGBA')(image)).toEqual(jasmine.any(ImageCore));
             expect(image.data).toEqual(TD.cscRgba20x20);
             expect(image.mode).toEqual('RGBA');
         });
         it('RGB to RGBA', () => {
             const image = new ImageCore('RGB');
             image.fromBuffer([20, 20], TD.cscRgb20x20);
-            expect(colorSpaceConvert(image, 'RGBA')).toEqual(jasmine.any(ImageCore));
+            expect(colorSpaceConvert('RGBA')(image)).toEqual(jasmine.any(ImageCore));
             expect(image.data).toEqual(TD.cscRgb20x20);
             expect(image.mode).toEqual('RGBA');
         });
         it('L to RGBA', () => {
             const image = new ImageCore('L');
             image.fromBuffer([20, 20], TD.cscL2RGBA20x20L);
-            expect(colorSpaceConvert(image, 'RGBA')).toEqual(jasmine.any(ImageCore));
+            expect(colorSpaceConvert('RGBA')(image)).toEqual(jasmine.any(ImageCore));
             expect(image.data).toEqual(TD.cscL2RGBA20x20RGBA);
             expect(image.mode).toEqual('RGBA');
         });
         it('RGBA to BGR', () => {
             const image = new ImageCore();
             image.fromBuffer([20, 20], TD.cscRgba20x20);
-            expect(colorSpaceConvert(image, 'BGR')).toEqual(jasmine.any(ImageCore));
+            expect(colorSpaceConvert('BGR')(image)).toEqual(jasmine.any(ImageCore));
             expect(image.data).toEqual(TD.cscBgr20x20);
             expect(image.mode).toEqual('BGR');
         });
         it('RGBA to BGRA', () => {
             const image = new ImageCore();
             image.fromBuffer([20, 20], TD.cscRgba20x20);
-            expect(colorSpaceConvert(image, 'BGRA')).toEqual(jasmine.any(ImageCore));
+            expect(colorSpaceConvert('BGRA')(image)).toEqual(jasmine.any(ImageCore));
             expect(image.data).toEqual(TD.cscBgra20x20);
             expect(image.mode).toEqual('BGRA');
         });
@@ -73,14 +73,14 @@ describe('ColorSpaceConvert', () => {
         it('RGBA to CMKY', () => {
             const image = new ImageCore();
             image.fromBuffer([20, 20], TD.cscRgba20x20);
-            expect(colorSpaceConvert(image, 'CMYK')).toEqual(jasmine.any(ImageCore));
+            expect(colorSpaceConvert('CMYK')(image)).toEqual(jasmine.any(ImageCore));
             expect(image.data).toEqual(TD.cscCMYK20x20);
             expect(image.mode).toEqual('CMYK');
         });
         it('CMYK to RGBA', () => {
             const image = new ImageCore();
             image.fromBuffer([20, 20], TD.cscCMYK20x20, 'CMYK');
-            expect(colorSpaceConvert(image, 'RGBA')).toEqual(jasmine.any(ImageCore));
+            expect(colorSpaceConvert('RGBA')(image)).toEqual(jasmine.any(ImageCore));
             expect(image.data).toEqual(TD.cscRgb20x20);
             expect(image.mode).toEqual('RGBA');
         });
@@ -88,14 +88,14 @@ describe('ColorSpaceConvert', () => {
         it('RGBA to HSL', () => {
             const image = new ImageCore();
             image.fromBuffer([20, 20], TD.cscRgba20x20);
-            expect(colorSpaceConvert(image, 'HSL')).toEqual(jasmine.any(ImageCore));
+            expect(colorSpaceConvert('HSL')(image)).toEqual(jasmine.any(ImageCore));
             expect(image.data).toEqual(TD.cscHSL20x20);
             expect(image.mode).toEqual('HSL');
         });
         it('HSL to RGBA', () => {
             const image = new ImageCore();
             image.fromBuffer([20, 20], TD.cscHSL20x20, 'HSL');
-            expect(colorSpaceConvert(image, 'RGBA')).toEqual(jasmine.any(ImageCore));
+            expect(colorSpaceConvert('RGBA')(image)).toEqual(jasmine.any(ImageCore));
             expect(image.data).toEqual(TD.cscRgba20x20);
             expect(image.mode).toEqual('RGBA');
         });
@@ -103,14 +103,14 @@ describe('ColorSpaceConvert', () => {
         it('RGBA to HSV', () => {
             const image = new ImageCore();
             image.fromBuffer([20, 20], TD.cscRgba20x20);
-            expect(colorSpaceConvert(image, 'HSV')).toEqual(jasmine.any(ImageCore));
+            expect(colorSpaceConvert('HSV')(image)).toEqual(jasmine.any(ImageCore));
             expect(image.data).toEqual(TD.cscHSV20x20);
             expect(image.mode).toEqual('HSV');
         });
         it('HSV to RGBA', () => {
             const image = new ImageCore();
             image.fromBuffer([20, 20], TD.cscHSV20x20, 'HSV');
-            expect(colorSpaceConvert(image, 'RGBA')).toEqual(jasmine.any(ImageCore));
+            expect(colorSpaceConvert('RGBA')(image)).toEqual(jasmine.any(ImageCore));
             expect(image.data).toEqual(TD.cscRgba20x20);
             expect(image.mode).toEqual('RGBA');
         });
@@ -120,11 +120,11 @@ describe('ColorSpaceConvert', () => {
         it('RGB to RGBA', done => {
             const image = new ImageCore();
             const url = '/base/testImages/rgba.png';
-            image.fromUrl(url)
+            image.fromURL(url)
                 .then(img => {
                     img.changeMode('RGB');
                     const s = performance.now();
-                    colorSpaceConvert(img, 'RGBA');
+                    colorSpaceConvert('RGBA')(img);
                     // tslint:disable-next-line
                     console.log('Performance, colorSpaceConvert, RGB to RGBA', img.size, img.mode, 'time(ms)', (performance.now() - s));
                     done();
@@ -133,11 +133,11 @@ describe('ColorSpaceConvert', () => {
         it('L to RGBA', done => {
             const image = new ImageCore();
             const url = '/base/testImages/rgba.png';
-            image.fromUrl(url)
+            image.fromURL(url)
                 .then(img => {
                     img.changeMode('L');
                     const s = performance.now();
-                    colorSpaceConvert(img, 'RGBA');
+                    colorSpaceConvert('RGBA')(img);
                     // tslint:disable-next-line
                     console.log('Performance, colorSpaceConvert, L to RGBA', img.size, img.mode, 'time(ms)', (performance.now() - s));
                     done();
@@ -146,10 +146,10 @@ describe('ColorSpaceConvert', () => {
         it('RGBA to BGR', done => {
             const image = new ImageCore();
             const url = '/base/testImages/rgba.png';
-            image.fromUrl(url)
+            image.fromURL(url)
                 .then(img => {
                     const s = performance.now();
-                    colorSpaceConvert(img, 'BGR');
+                    colorSpaceConvert('BGR')(img);
                     // tslint:disable-next-line
                     console.log('Performance, colorSpaceConvert, RGBA to BGR', img.size, img.mode, 'time(ms)', (performance.now() - s));
                     done();
@@ -158,14 +158,14 @@ describe('ColorSpaceConvert', () => {
         it('RGBA <-> CMYK', done => {
             const image = new ImageCore();
             const url = '/base/testImages/rgba.png';
-            image.fromUrl(url)
+            image.fromURL(url)
                 .then(img => {
                     let s = performance.now();
-                    colorSpaceConvert(img, 'CMYK');
+                    colorSpaceConvert('CMYK')(img);
                     // tslint:disable-next-line
                     console.log('Performance, colorSpaceConvert, RGBA to CMYK', img.size, img.mode, 'time(ms)', (performance.now() - s));
                     s = performance.now();
-                    colorSpaceConvert(img, 'RGBA');
+                    colorSpaceConvert('RGBA')(img);
                     // tslint:disable-next-line
                     console.log('Performance, colorSpaceConvert, CMYK to RGBA', img.size, img.mode, 'time(ms)', (performance.now() - s));
                     done();
@@ -174,14 +174,14 @@ describe('ColorSpaceConvert', () => {
         it('RGBA <-> HSL', done => {
             const image = new ImageCore();
             const url = '/base/testImages/rgba.png';
-            image.fromUrl(url)
+            image.fromURL(url)
                 .then(img => {
                     let s = performance.now();
-                    colorSpaceConvert(img, 'HSL');
+                    colorSpaceConvert('HSL')(img);
                     // tslint:disable-next-line
                     console.log('Performance, colorSpaceConvert, RGBA to HSL', img.size, img.mode, 'time(ms)', (performance.now() - s));
                     s = performance.now();
-                    colorSpaceConvert(img, 'RGBA');
+                    colorSpaceConvert('RGBA')(img);
                     // tslint:disable-next-line
                     console.log('Performance, colorSpaceConvert, HSL to RGBA', img.size, img.mode, 'time(ms)', (performance.now() - s));
                     done();
@@ -190,14 +190,14 @@ describe('ColorSpaceConvert', () => {
         it('RGBA <-> HSV', done => {
             const image = new ImageCore();
             const url = '/base/testImages/rgba.png';
-            image.fromUrl(url)
+            image.fromURL(url)
                 .then(img => {
                     let s = performance.now();
-                    colorSpaceConvert(img, 'HSV');
+                    colorSpaceConvert('HSV')(img);
                     // tslint:disable-next-line
                     console.log('Performance, colorSpaceConvert, RGBA to HSV', img.size, img.mode, 'time(ms)', (performance.now() - s));
                     s = performance.now();
-                    colorSpaceConvert(img, 'RGBA');
+                    colorSpaceConvert('RGBA')(img);
                     // tslint:disable-next-line
                     console.log('Performance, colorSpaceConvert, HSV to RGBA', img.size, img.mode, 'time(ms)', (performance.now() - s));
                     done();

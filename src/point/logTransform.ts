@@ -29,10 +29,10 @@ function getBorder(
  * @param times {number[]}
  * @returns {ImageCore}
  */
-export function logTransform(
-    image: ImageCore,
-    times: number[]
-): ImageCore {
+export const logTransform = (
+    times: number[] | number
+) => (image: ImageCore) => {
+    times = typeof times === 'number' ? [times, times, times] : times;
     const size = image.data.length;
     switch (image.mode) {
         case 'RGB':
@@ -91,4 +91,4 @@ export function logTransform(
             break;
     }
     return image;
-}
+};

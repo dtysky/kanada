@@ -10,11 +10,14 @@ import {
 } from '../constants';
 import {Exceptions} from './exceptions';
 
+export type TOperate = (image: ImageCore) => ImageCore;
+
 export default class ImageCore {
     private _mode: TColorSpace;
     private _canvas: HTMLCanvasElement;
     private _context: CanvasRenderingContext2D;
     private _data: ImageData;
+    private _operations: TOperate[];
     // a flag for push back data to context lazily
     public dataIsModified: boolean;
 
@@ -25,6 +28,7 @@ export default class ImageCore {
         this._canvas = document.createElement('canvas');
         this._context = this._canvas.getContext('2d');
         this._data = new ImageData(1, 1);
+        this._operations = [];
         this.dataIsModified = false;
     }
 
@@ -49,24 +53,33 @@ export default class ImageCore {
         return new Uint8ClampedArray(this._data.data);
     }
 
+    public get imageData(): ImageData {
+        return this._data;
+    }
+
     public get dataURL(): string {
         return this._canvas.toDataURL();
     }
 
-    public fromImage(
-        image: HTMLImageElement
+    public get canvas(): HTMLCanvasElement {
+        return this._canvas;
+    }
+
+    public fromElement(
+        element: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement
     ): ImageCore {
         // if (this._mode !== 'RGBA') {
         //     throw new Exceptions.ColorSpaceError('the mode of image', this._mode, 'RGBA');
         // }
+        this._mode = 'RGBA';
         const canvas = this._canvas;
-        canvas.width = image.width;
-        canvas.height = image.height;
+        canvas.width = element.width;
+        canvas.height = element.height;
         const context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        context.drawImage(element, 0, 0, canvas.width, canvas.height);
         this._context = context;
-        this._data = context.getImageData(0, 0, image.width, image.height);
+        this._data = context.getImageData(0, 0, element.width, element.height);
         return this;
     }
 
@@ -91,7 +104,7 @@ export default class ImageCore {
         return this;
     }
 
-    public fromUrl(
+    public fromURL(
         url: string
     ): Promise<ImageCore> {
         // if (this._mode !== 'RGBA') {
@@ -110,7 +123,7 @@ export default class ImageCore {
         return new Promise((resolve, reject) => {
             const image = new Image();
             image.onload = () => {
-                resolve(this.fromImage(image));
+                resolve(this.fromElement(image));
             };
             image.onerror = () => {
                 this._data = new ImageData(1, 1);
@@ -145,7 +158,7 @@ export default class ImageCore {
         return this;
     }
 
-    public pushDataBackToContext() {
+    public normalizeData() {
         if (this._mode === 'L' || this._mode === 'B') {
             this.modifyData((data, size, length) => {
                 for (let pos = 0; pos < length; pos += 4) {
@@ -154,8 +167,12 @@ export default class ImageCore {
                 }
             });
         }
-        this._context.putImageData(this._data, 0, 0);
         this.dataIsModified = false;
+    }
+
+    public pushDataBackToContext() {
+        this.normalizeData();
+        this._context.putImageData(this._data, 0, 0);
     }
 
     public modifyData(
@@ -215,6 +232,26 @@ export default class ImageCore {
                 x = x === rowSize ? 0 : x + 1;
             }
         }
+    }
+
+    public add(operate: TOperate) {
+        this._operations.push(operate);
+    }
+
+    public remove(operate: TOperate) {
+        this._operations.splice(this._operations.indexOf(operate), 1);
+    }
+
+    public clear() {
+        this._operations = [];
+    }
+
+    public apply(operate: TOperate) {
+        operate(this);
+    }
+
+    public exec() {
+        this._operations.forEach(operate => operate(this));
     }
 
     public map(

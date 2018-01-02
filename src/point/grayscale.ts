@@ -6,9 +6,7 @@
 
 import {Exceptions, ImageCore} from '../core';
 
-export function grayscale(
-    image: ImageCore
-): ImageCore {
+export const grayscale = () => (image: ImageCore) => {
     if (image.mode !== 'RGBA' && image.mode !== 'RGB' && image.mode !== 'BGR' && image.mode !== 'BGRA') {
         throw new Exceptions.ColorSpaceError('the mode of image to be grayscaled', image.mode, 'RGB', 'RGBA');
     }

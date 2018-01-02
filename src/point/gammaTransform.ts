@@ -21,7 +21,6 @@ function getBorder(
     times: number,
     gain: number
 ): TChannel {
-    // loga(b) = 1 / logb(a)
     return Math.pow((max / times), 1 / gain);
 }
 
@@ -32,11 +31,10 @@ function getBorder(
  * @param gammas {number[]}
  * @returns {ImageCore}
  */
-export function gammaTransform(
-    image: ImageCore,
+export const gammaTransform = (
     times: number[] | number,
     gammas: number[] | number
-): ImageCore {
+) => (image: ImageCore) => {
     times = typeof times === 'number' ? [times, times, times] : times;
     gammas = typeof gammas === 'number' ? [gammas, gammas, gammas] : gammas;
     const size = image.data.length;
@@ -100,4 +98,4 @@ export function gammaTransform(
             break;
     }
     return image;
-}
+};

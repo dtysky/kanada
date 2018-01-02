@@ -15,7 +15,7 @@ describe('ColorInvert', () => {
             it(color, () => {
                 const image = new ImageCore();
                 image.fromBuffer([20, 20], TD.CR20x20[`${color}_O`], <TColorSpace>color);
-                expect(colorInvert(image)).toEqual(jasmine.any(ImageCore));
+                expect(colorInvert()(image)).toEqual(jasmine.any(ImageCore));
                 expect(image.data).toEqual(TD.CR20x20[`${color}_R`]);
                 expect(image.mode).toEqual(color);
             });
@@ -27,11 +27,11 @@ describe('ColorInvert', () => {
             it(color, done => {
                 const image = new ImageCore();
                 const url = '/base/testImages/rgba.png';
-                image.fromUrl(url)
+                image.fromURL(url)
                     .then(img => {
                         img.changeMode(<TColorSpace>color);
                         const s = performance.now();
-                        colorInvert(img);
+                        colorInvert()(img);
                         // tslint:disable-next-line
                         console.log('Performance, colorInvert', color, img.size, img.mode, 'time(ms)', (performance.now() - s));
                         done();

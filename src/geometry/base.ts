@@ -6,13 +6,12 @@
 import {ImageCore} from '../core';
 import {TPosition, TPixel} from '../constants';
 
-export default function geometryBaseOperate(
-  image: ImageCore,
+export default (
   attributes: any,
-  background: TPixel,
+  background: TPixel = [0, 0, 0, 0],
   prepare: (attributes: any) => any,
   calculate: (newX: number, newY: number, args: any) => {oldX: number, oldY: number}
-): ImageCore {
+) => (image: ImageCore) => {
     image.modifyData((data, size) => {
         const originData = data.slice(0);
         const [width, height] = size;
