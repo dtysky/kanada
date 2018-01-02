@@ -6,7 +6,7 @@
 
 import {
     TColorSpace, TImageSize, TPixel, TCoord, TPosition, TBuffer,
-    PIXEL_SIZE, Environments
+    PIXEL_SIZE, Environments, TRegion
 } from '../constants';
 import {Exceptions} from './exceptions';
 
@@ -17,6 +17,7 @@ export default class ImageCore {
     private _canvas: HTMLCanvasElement;
     private _context: CanvasRenderingContext2D;
     private _data: ImageData;
+    private _region: TRegion;
     private _operations: TOperate[];
     // a flag for push back data to context lazily
     public dataIsModified: boolean;
@@ -28,6 +29,7 @@ export default class ImageCore {
         this._canvas = document.createElement('canvas');
         this._context = this._canvas.getContext('2d');
         this._data = new ImageData(1, 1);
+        this.region = [0, 0, 0, 0];
         this._operations = [];
         this.dataIsModified = false;
     }
@@ -65,6 +67,14 @@ export default class ImageCore {
         return this._canvas;
     }
 
+    public set region(region: TRegion) {
+        this._region = region;
+    }
+
+    public get region(): TRegion {
+        return this._region;
+    }
+
     public fromElement(
         element: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement
     ): ImageCore {
@@ -80,6 +90,7 @@ export default class ImageCore {
         context.drawImage(element, 0, 0, canvas.width, canvas.height);
         this._context = context;
         this._data = context.getImageData(0, 0, element.width, element.height);
+        this.region = [0, 0, canvas.width, canvas.height];
         return this;
     }
 
@@ -101,6 +112,7 @@ export default class ImageCore {
         context.putImageData(this._data, 0, 0);
         this._context = context;
         this._mode = mode || this._mode;
+        this.region = [0, 0, canvas.width, canvas.height];
         return this;
     }
 
@@ -160,10 +172,15 @@ export default class ImageCore {
 
     public normalizeData() {
         if (this._mode === 'L' || this._mode === 'B') {
-            this.modifyData((data, size, length) => {
-                for (let pos = 0; pos < length; pos += 4) {
-                    data[pos + 1] = data[pos];
-                    data[pos + 2] = data[pos];
+            const [left, top, right, bottom] = this._region;
+            const [width, height] = this.size;
+            this.modifyData((data) => {
+                for (let y = top; y < bottom; y += 1) {
+                    for (let x = left; x < right; x += 1) {
+                        const pos = (x + y * width) * 4;
+                        data[pos + 1] = data[pos];
+                        data[pos + 2] = data[pos];
+                    }
                 }
             });
         }
@@ -176,11 +193,26 @@ export default class ImageCore {
     }
 
     public modifyData(
-        imageOption: (data: Uint8ClampedArray, size: TImageSize, length: number) => void | Uint8ClampedArray
+        imageOption: (data: Uint8ClampedArray, size: TImageSize, region: TRegion) => void | Uint8ClampedArray
     ): ImageCore {
-        const data = imageOption(this._data.data, this.size, this._data.data.length);
+        const data = imageOption(this._data.data, this.size, this._region);
         if (data) {
             this._data.data.set(data);
+        }
+        this.dataIsModified = true;
+        return this;
+    }
+
+    public modifyValidPixels(
+        pixelOption: (data: Uint8ClampedArray, pos: number) => void | Uint8ClampedArray
+    ): ImageCore {
+        const [left, top, right, bottom] = this._region;
+        const [width, height] = this.size;
+        const data = this._data.data;
+        for (let y = top; y < bottom; y += 1) {
+            for (let x = left; x < right; x += 1) {
+                pixelOption(data, (x + y * width) * 4);
+            }
         }
         this.dataIsModified = true;
         return this;

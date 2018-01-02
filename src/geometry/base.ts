@@ -12,15 +12,21 @@ export default (
   prepare: (attributes: any) => any,
   calculate: (newX: number, newY: number, args: any) => {oldX: number, oldY: number}
 ) => (image: ImageCore) => {
-    image.modifyData((data, size) => {
+    image.modifyData((data, size, region) => {
         const originData = data.slice(0);
         const [width, height] = size;
+        const [left, top, right, bottom] = region;
         const args = prepare(attributes);
+        // note: why not newY in (left..right) ?
+        // For performance, just have some tests.
         for (let newY = 0; newY < height; newY += 1) {
             for (let newX = 0; newX < width; newX += 1) {
+                if (newX < left || newX > right || newY < top || newY > bottom) {
+                    continue;
+                }
                 const newPos = (newY * width + newX) * 4;
                 const {oldX, oldY} = calculate(newX, newY, args);
-                if (oldX < 0 || oldX > width || oldY < 0 || oldY > height) {
+                if (oldX < left || oldX > right || oldY < top || oldY > bottom) {
                     data[newPos] = background[0];
                     if (image.mode !== 'L' && image.mode !== 'B') {
                         data[newPos + 1] = background[1];

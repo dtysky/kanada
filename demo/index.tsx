@@ -60,33 +60,36 @@ class Main extends React.Component<any, any> {
       //   this.setState({img: processor.toImage()});
       // };
       // im.src = url;
-      console.log('colorInvert: size:', image.size);
-      const data = image.data;
-      const nByte = 1;
+      // console.log('colorInvert: size:', image.size);
+      // const data = image.data;
+      // const nByte = 1;
 
-      const s1 = performance.now();
+      // const s1 = performance.now();
 
-      const ptr = Module._malloc(data.length * nByte);
-      Module.HEAPU8.set(data, ptr / nByte);
-      const resPtr = wasmColorInvert(ptr, data.length / nByte);
-      const pos = resPtr / nByte;
-      const resData = Module.HEAPU8.subarray(pos, pos + data.length);
-      Module._free(ptr);
+      // const ptr = Module._malloc(data.length * nByte);
+      // Module.HEAPU8.set(data, ptr / nByte);
+      // const resPtr = wasmColorInvert(ptr, data.length / nByte);
+      // const pos = resPtr / nByte;
+      // const resData = Module.HEAPU8.subarray(pos, pos + data.length);
+      // Module._free(ptr);
 
-      console.log('Performance WASM', performance.now() - s1);
+      // console.log('Performance WASM', performance.now() - s1);
 
-      const s2 = performance.now();
+      // const s2 = performance.now();
 
-      const res = gpuColorInvert.setOutput([data.length])(data);
+      // const res = gpuColorInvert.setOutput([data.length])(data);
 
-      console.log('Performance GPU', performance.now() - s2);
+      // console.log('Performance GPU', performance.now() - s2);
 
+      image.region = [100, 100, 400, 400];
       const s = performance.now();
+      // image.apply(kanata.contrastStretch(40, 40, 160, 160));
+      image.apply(kanata.grayLayered(40, 40, 160, 160, [0, 0, 0]));
       image.apply(kanata.grayscale());
-      // kanata.translate(img, [100, 100]);
-      // kanata.rotate(image, 30 * Math.PI / 180, [image.width / 2, image.height / 2]);
+      image.apply(kanata.globalThreshold(100));
+      // image.apply(kanata.translate([100, 100]));
+      // image.apply(kanata.rotate(30 * Math.PI / 180, [image.width / 2, image.height / 2]));
       // kanata.shear(image, [.5, .5]);
-      // image.add(kanata.colorInvert());
       // image.exec();
       // kanata.colorInvert()(image);
       // kanata.scale(image, [.5, .5]);
@@ -106,7 +109,7 @@ class Main extends React.Component<any, any> {
 
     this.ctx = ctx;
     this.video = video;
-    vImage.add(kanata.linearTransform(40));
+    vImage.add(kanata.contrastStretch(40, 40, 160, 160));
     this.update();
     video.play();
   }

@@ -8,7 +8,8 @@ import {ImageCore} from '../core';
 import {COLOR_MAX} from '../constants';
 
 export const colorInvert = () => (image: ImageCore) => {
-    const size = image.data.length;
+    const [left, top, right, bottom] = image.region;
+    const [width, height] = image.size;
     switch (image.mode) {
         case 'RGB':
         case 'RGBA':
@@ -18,10 +19,13 @@ export const colorInvert = () => (image: ImageCore) => {
         case 'HSV': {
             const [max1, max2, max3] = COLOR_MAX[image.mode];
             image.modifyData(data => {
-                for (let pos = 0; pos < size; pos += 4) {
-                    data[pos] = max1 - data[pos];
-                    data[pos + 1] = max2 - data[pos + 1];
-                    data[pos + 2] = max3 - data[pos + 2];
+                for (let y = top; y < bottom; y += 1) {
+                    for (let x = left; x < right; x += 1) {
+                        const pos = (x + y * width) * 4;
+                        data[pos] = max1 - data[pos];
+                        data[pos + 1] = max2 - data[pos + 1];
+                        data[pos + 2] = max3 - data[pos + 2];
+                    }
                 }
             });
             break;
@@ -30,8 +34,11 @@ export const colorInvert = () => (image: ImageCore) => {
         case 'B': {
             const [max1] = COLOR_MAX[image.mode];
             image.modifyData(data => {
-                for (let pos = 0; pos < size; pos += 4) {
-                    data[pos] = max1 - data[pos];
+                for (let y = top; y < bottom; y += 1) {
+                    for (let x = left; x < right; x += 1) {
+                        const pos = (x + y * width) * 4;
+                        data[pos] = max1 - data[pos];
+                    }
                 }
             });
             break;
@@ -39,11 +46,14 @@ export const colorInvert = () => (image: ImageCore) => {
         case 'CMYK': {
             const [max1, max2, max3, max4] = COLOR_MAX[image.mode];
             image.modifyData(data => {
-                for (let pos = 0; pos < size; pos += 4) {
-                    data[pos] = max1 - data[pos];
-                    data[pos + 1] = max2 - data[pos + 1];
-                    data[pos + 2] = max3 - data[pos + 2];
-                    data[pos + 3] = max4 - data[pos + 3];
+                for (let y = top; y < bottom; y += 1) {
+                    for (let x = left; x < right; x += 1) {
+                        const pos = (x + y * width) * 4;
+                        data[pos] = max1 - data[pos];
+                        data[pos + 1] = max2 - data[pos + 1];
+                        data[pos + 2] = max3 - data[pos + 2];
+                        data[pos + 3] = max4 - data[pos + 3];
+                    }
                 }
             });
             break;
@@ -52,4 +62,4 @@ export const colorInvert = () => (image: ImageCore) => {
             break;
     }
     return image;
-}
+};

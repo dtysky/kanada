@@ -52,9 +52,9 @@ export type TCoord = number;
 export type TPosition = [TCoord, TCoord];
 
 /**
- * Type of Edge, it will be [left, top, right, bottom]
+ * Type of Region, it will be [left, top, right, bottom]
  */
-export type TEdge = [TCoord, TCoord, TCoord, TCoord];
+export type TRegion = [TCoord, TCoord, TCoord, TCoord];
 
 /**
  * Type of pixel, it will be [r, g, b, a] etc

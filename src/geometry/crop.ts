@@ -4,15 +4,15 @@
  * Description: Crop an image by given TEdge.
  */
 import {ImageCore} from '../core';
-import {TPosition, TPixel, TEdge} from '../constants';
+import {TPosition, TPixel, TRegion} from '../constants';
 import geometryBaseOperate from './base';
 
 export function crop (
-    edge: TEdge,
+    region: TRegion,
     background?: TPixel
 ) {
     return geometryBaseOperate(
-        edge,
+        region,
         background,
         (attributes: any) => ({
             left: attributes[0],

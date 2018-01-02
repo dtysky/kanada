@@ -11,14 +11,24 @@ export default class VideoCore {
 
     constructor() {
         this._imageCore = new ImageCore();
-    }
-
-    public fromURL(url: string) {
-
+        this._video = null;
     }
 
     public fromVideo(video: HTMLVideoElement) {
+        this._video = video;
+        this._video.addEventListener('timeupdate', this.handleUpdate);
+    }
 
+    public reset() {
+        this._video.removeEventListener('timeupdate', this.handleUpdate);
+        this._video = null;
+    }
+
+    private handleUpdate = () => {
+        this._imageCore.fromElement(this._video);
+        this._imageCore.exec();
+        this._imageCore.pushDataBackToContext();
+        
     }
 
     public add(operate: TOperate) {
