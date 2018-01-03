@@ -13,3 +13,4 @@ export * from './gammaTransform';
 export * from './globalThreshold';
 export * from './contrastStretch';
 export * from './grayLayered';
+export * from './mask';

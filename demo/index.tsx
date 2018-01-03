@@ -14,6 +14,12 @@ const url = '/base/testImages/x.jpg';
 const vImage = new kanata.ImageCore();
 const vUrl = '/base/testImages/x.mp4';
 
+const maskImage = new kanata.ImageCore();
+const maskUrl = '/base/testImages/mask.png';
+
+const bgImage = new kanata.ImageCore();
+const bgUrl = '/base/testImages/bg.jpg';
+
 // declare const require: any;
 // const {initialize} = require('./test.cpp');
 // const initialize = require('./test.wasm');
@@ -49,7 +55,7 @@ class Main extends React.Component<any, any> {
   }
 
   private handleClick = () => image.fromURL(url)
-    .then(img => {
+    .then(async img => {
       // const im = new Image();
       // const processor = new FILTER.Image(im);
       // im.onload = () => {
@@ -82,11 +88,16 @@ class Main extends React.Component<any, any> {
       // console.log('Performance GPU', performance.now() - s2);
 
       image.region = [100, 100, 400, 400];
+      await maskImage.fromURL(maskUrl);
+      await bgImage.fromURL(bgUrl);
       const s = performance.now();
+      image.apply(kanata.mask(maskImage, bgImage));
       // image.apply(kanata.contrastStretch(40, 40, 160, 160));
-      image.apply(kanata.grayLayered(40, 40, 160, 160, [0, 0, 0]));
-      image.apply(kanata.grayscale());
-      image.apply(kanata.globalThreshold(100));
+      // image.apply(kanata.grayLayered(40, 40, 160, 160, [0, 0, 0]));
+      // image.apply(kanata.grayscale());
+      // image.apply(kanata.globalThreshold(100));
+      // image.apply(kanata.changeRegion([0, 0, 200, 200]));
+      // image.apply(kanata.globalThreshold(80));
       // image.apply(kanata.translate([100, 100]));
       // image.apply(kanata.rotate(30 * Math.PI / 180, [image.width / 2, image.height / 2]));
       // kanata.shear(image, [.5, .5]);
@@ -109,7 +120,7 @@ class Main extends React.Component<any, any> {
 
     this.ctx = ctx;
     this.video = video;
-    vImage.add(kanata.contrastStretch(40, 40, 160, 160));
+    vImage.pipe(kanata.contrastStretch(40, 40, 160, 160));
     this.update();
     video.play();
   }

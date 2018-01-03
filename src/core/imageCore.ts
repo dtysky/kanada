@@ -21,6 +21,8 @@ export default class ImageCore {
     private _operations: TOperate[];
     // a flag for push back data to context lazily
     public dataIsModified: boolean;
+    // a flag for checking if data has been normalized in 'L' and 'B' mode
+    public dataIsNormalized: boolean;
 
     constructor(
         mode: TColorSpace = <TColorSpace>'RGBA'
@@ -32,6 +34,7 @@ export default class ImageCore {
         this.region = [0, 0, 0, 0];
         this._operations = [];
         this.dataIsModified = false;
+        this.dataIsNormalized = true;
     }
 
     public get mode(): TColorSpace {
@@ -69,6 +72,7 @@ export default class ImageCore {
 
     public set region(region: TRegion) {
         this._region = region;
+        this.normalizeData();
     }
 
     public get region(): TRegion {
@@ -99,8 +103,8 @@ export default class ImageCore {
         buffer: TBuffer,
         mode?: TColorSpace
     ): ImageCore {
-        if (size[0] * size[1] * 4 !== buffer.length) {
-            throw new Exceptions.BufferSizeError(buffer.length, size[0] * size[1] * 4);
+        if (size[0] * size[1] << 2 !== buffer.length) {
+            throw new Exceptions.BufferSizeError(buffer.length, size[0] * size[1] << 2);
         }
         const canvas = this._canvas;
         canvas.width = size[0];
@@ -112,6 +116,24 @@ export default class ImageCore {
         context.putImageData(this._data, 0, 0);
         this._context = context;
         this._mode = mode || this._mode;
+        this.region = [0, 0, canvas.width, canvas.height];
+        return this;
+    }
+
+    public fromColor(color: TPixel = [0, 0, 0, 0], size: TImageSize = [512, 512]) {
+        if (color.length !== 4) {
+            throw new Exceptions.ArraySizeError('Create an image from color', color.length, 4);
+        }
+        const canvas = this._canvas;
+        canvas.width = size[0];
+        canvas.height = size[1];
+        const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = `rgba(${color.join(',')})`;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        this._context = context;
+        this._data = context.getImageData(0, 0, canvas.width, canvas.height);
+        this._mode = 'RGBA';
         this.region = [0, 0, canvas.width, canvas.height];
         return this;
     }
@@ -171,33 +193,42 @@ export default class ImageCore {
     }
 
     public normalizeData() {
+        if (this.normalizeData) {
+            return;
+        }
         if (this._mode === 'L' || this._mode === 'B') {
             const [left, top, right, bottom] = this._region;
             const [width, height] = this.size;
             this.modifyData((data) => {
                 for (let y = top; y < bottom; y += 1) {
                     for (let x = left; x < right; x += 1) {
-                        const pos = (x + y * width) * 4;
+                        const pos = (x + y * width) << 2;
                         data[pos + 1] = data[pos];
                         data[pos + 2] = data[pos];
                     }
                 }
             });
+            this.changeMode('RGBA');
         }
-        this.dataIsModified = false;
+        this.dataIsNormalized = true;
     }
 
     public pushDataBackToContext() {
         this.normalizeData();
+        this.dataIsModified = false;
         this._context.putImageData(this._data, 0, 0);
     }
 
     public modifyData(
         imageOption: (data: Uint8ClampedArray, size: TImageSize, region: TRegion) => void | Uint8ClampedArray
     ): ImageCore {
+        const mode = this._mode;
         const data = imageOption(this._data.data, this.size, this._region);
         if (data) {
             this._data.data.set(data);
+        }
+        if (this._mode === 'L' || this._mode === 'B') {
+            this.dataIsNormalized = false;
         }
         this.dataIsModified = true;
         return this;
@@ -206,13 +237,17 @@ export default class ImageCore {
     public modifyValidPixels(
         pixelOption: (data: Uint8ClampedArray, pos: number) => void | Uint8ClampedArray
     ): ImageCore {
+        const mode = this._mode;
         const [left, top, right, bottom] = this._region;
         const [width, height] = this.size;
         const data = this._data.data;
         for (let y = top; y < bottom; y += 1) {
             for (let x = left; x < right; x += 1) {
-                pixelOption(data, (x + y * width) * 4);
+                pixelOption(data, (x + y * width) << 2);
             }
+        }
+        if (this._mode === 'L' || this._mode === 'B') {
+            this.dataIsNormalized = false;
         }
         this.dataIsModified = true;
         return this;
@@ -266,7 +301,7 @@ export default class ImageCore {
         }
     }
 
-    public add(operate: TOperate) {
+    public pipe(operate: TOperate) {
         this._operations.push(operate);
     }
 

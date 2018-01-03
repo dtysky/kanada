@@ -24,7 +24,7 @@ export default (
                 if (newX < left || newX > right || newY < top || newY > bottom) {
                     continue;
                 }
-                const newPos = (newY * width + newX) * 4;
+                const newPos = (newY * width + newX) << 2;
                 const {oldX, oldY} = calculate(newX, newY, args);
                 if (oldX < left || oldX > right || oldY < top || oldY > bottom) {
                     data[newPos] = background[0];
@@ -35,7 +35,7 @@ export default (
                     data[newPos + 3] = background[3] || 1;
                     continue;
                 }
-                const oldPos = (oldY * width + oldX) * 4;
+                const oldPos = (oldY * width + oldX) << 2;
                 data[newPos] = originData[oldPos];
                 if (image.mode !== 'L' && image.mode !== 'B') {
                     data[newPos + 1] = originData[oldPos + 1];

@@ -18,10 +18,10 @@ export const grayscale = () => (image: ImageCore) => {
             image.modifyData(data => {
                 for (let y = top; y < bottom; y += 1) {
                     for (let x = left; x < right; x += 1) {
-                        const pos = (x + y * width) * 4;
+                        const pos = (x + y * width) << 2;
                         // optimization for v8 engine
                         // calculating color in this way could avoid type conversion
-                        const pixel = (data[pos] * 4899 >> 14) + (data[pos + 1] * 9617 >> 14) + (data[pos + 2] * 1868 >> 14);
+                        const pixel = (data[pos] << 2899 >> 14) + (data[pos + 1] * 9617 >> 14) + (data[pos + 2] * 1868 >> 14);
                         data[pos] = pixel;
                         data[pos + 1] = pixel;
                         data[pos + 2] = pixel;
@@ -34,8 +34,8 @@ export const grayscale = () => (image: ImageCore) => {
             image.modifyData(data => {
                 for (let y = top; y < bottom; y += 1) {
                     for (let x = left; x < right; x += 1) {
-                        const pos = (x + y * width) * 4;
-                        const pixel = (data[pos] * 1868 >> 14) + (data[pos + 1] * 9617 >> 14) + (data[pos + 2] * 4899 >> 14);
+                        const pos = (x + y * width) << 2;
+                        const pixel = (data[pos] * 1868 >> 14) + (data[pos + 1] * 9617 >> 14) + (data[pos + 2] << 2899 >> 14);
                         data[pos] = pixel;
                         data[pos + 1] = pixel;
                         data[pos + 2] = pixel;

@@ -45,7 +45,7 @@ export const contrastStretch = (
             image.modifyData(data => {
                 for (let y = top; y < bottom; y += 1) {
                     for (let x = left; x < right; x += 1) {
-                        const pos = (x + y * width) * 4;
+                        const pos = (x + y * width) << 2;
                         data[pos] = opt(data[pos]);
                         data[pos + 1] = opt(data[pos + 1]);
                         data[pos + 2] = opt(data[pos + 2]);
@@ -58,7 +58,7 @@ export const contrastStretch = (
             image.modifyData(data => {
                 for (let y = top; y < bottom; y += 1) {
                     for (let x = left; x < right; x += 1) {
-                        const pos = (x + y * width) * 4;
+                        const pos = (x + y * width) << 2;
                         data[pos] = opt(data[pos]);
                     }
                 }

@@ -56,7 +56,7 @@ export const gammaTransform = (
             image.modifyData(data => {
                 for (let y = top; y < bottom; y += 1) {
                     for (let x = left; x < right; x += 1) {
-                        const pos = (x + y * width) * 4;
+                        const pos = (x + y * width) << 2;
                         data[pos] = data[pos] > border1 ? max1 : ~~(t1 * Math.pow(data[pos], g1));
                         data[pos + 1] = data[pos + 1] > border2 ? max2 : ~~(t2 * Math.pow(data[pos + 1], g2));
                         data[pos + 2] = data[pos + 2] > border3 ? max3 : ~~(t3 * Math.pow(data[pos + 2], g3));
@@ -75,7 +75,7 @@ export const gammaTransform = (
             image.modifyData(data => {
                 for (let y = top; y < bottom; y += 1) {
                     for (let x = left; x < right; x += 1) {
-                        const pos = (x + y * width) * 4;
+                        const pos = (x + y * width) << 2;
                         data[pos] = data[pos] > border1 ? max1 : ~~(t1 * Math.pow(data[pos], g1));
                     }
                 }
@@ -94,7 +94,7 @@ export const gammaTransform = (
             image.modifyData(data => {
                 for (let y = top; y < bottom; y += 1) {
                     for (let x = left; x < right; x += 1) {
-                        const pos = (x + y * width) * 4;
+                        const pos = (x + y * width) << 2;
                         data[pos] = data[pos] > border1 ? max1 : ~~(t1 * Math.pow(data[pos], g1));
                         data[pos + 1] = data[pos + 1] > border2 ? max2 : ~~(t2 * Math.pow(data[pos + 1], g2));
                         data[pos + 2] = data[pos + 2] > border3 ? max3 : ~~(t3 * Math.pow(data[pos + 2], g3));

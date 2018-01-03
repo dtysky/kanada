@@ -32,7 +32,7 @@ export default class VideoCore {
     }
 
     public add(operate: TOperate) {
-        this._imageCore.add(operate);
+        this._imageCore.pipe(operate);
     }
 
     public remove(operate: TOperate) {

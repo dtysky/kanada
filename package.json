@@ -1,7 +1,7 @@
 {
   "name": "kanata",
-  "version": "0.0.1",
-  "description": "Port opencv to Javascript.",
+  "version": "0.2.0",
+  "description": "An modern library for image processing on web.",
   "main": "index.js",
   "scripts": {
     "init-project": "bash ./init.sh",
@@ -14,7 +14,10 @@
   },
   "keywords": [
     "image processing",
-    "kanata"
+    "kanata",
+    "typescript",
+    "webassembly",
+    "gpu"
   ],
   "author": "dtysky",
   "license": "MIT",

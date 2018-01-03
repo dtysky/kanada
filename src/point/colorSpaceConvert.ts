@@ -57,13 +57,15 @@ export const colorSpaceConvert = (
         case 'B_BGRA':
         case 'B_RGB':
         case 'B_BGR':
-        case 'B_L':
             image.modifyData(data => {
                 for (let pos = 0; pos < size; pos += 4) {
                     data[pos + 1] = data[pos];
                     data[pos + 2] = data[pos];
                 }
             });
+            image.dataIsNormalized = true;
+            return image.changeMode(dstMode);
+        case 'B_L':
             return image.changeMode(dstMode);
         default:
             break;
