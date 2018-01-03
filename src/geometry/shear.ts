@@ -12,11 +12,10 @@ export function shear (
     background?: TPixel
 ) {
     return geometryBaseOperate(
-        factors,
         background,
-        (attributes: any) => ({
-            fX: attributes[0],
-            fY: attributes[1]
+        () => ({
+            fX: factors[0],
+            fY: factors[1]
         }),
         (newX: number, newY: number, args: any) => ({
             oldX: ~~(newX / args.fX) - newY,

@@ -12,11 +12,10 @@ export function scale (
     background?: TPixel
 ) {
     return geometryBaseOperate(
-        factors,
         background,
-        (attributes: any) => ({
-            sX: attributes[0],
-            sY: attributes[1]
+        () => ({
+            sX: factors[0],
+            sY: factors[1]
         }),
         (newX: number, newY: number, args: any) => ({
             oldX: ~~(newX / args.sX),

@@ -7,16 +7,15 @@ import {ImageCore} from '../core';
 import {TPosition, TPixel} from '../constants';
 
 export default (
-  attributes: any,
   background: TPixel = [0, 0, 0, 0],
-  prepare: (attributes: any) => any,
+  prepare: () => any,
   calculate: (newX: number, newY: number, args: any) => {oldX: number, oldY: number}
 ) => (image: ImageCore) => {
     image.modifyData((data, size, region) => {
         const originData = data.slice(0);
         const [width, height] = size;
         const [left, top, right, bottom] = region;
-        const args = prepare(attributes);
+        const args = prepare();
         // note: why not newY in (left..right) ?
         // For performance, just have some tests.
         for (let newY = 0; newY < height; newY += 1) {

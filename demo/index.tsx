@@ -87,11 +87,12 @@ class Main extends React.Component<any, any> {
 
       // console.log('Performance GPU', performance.now() - s2);
 
-      image.region = [100, 100, 400, 400];
+      // image.region = [100, 100, 400, 400];
       await maskImage.fromURL(maskUrl);
       await bgImage.fromURL(bgUrl);
       const s = performance.now();
-      image.apply(kanata.mask(maskImage, bgImage));
+      image.apply(kanata.affineTransform(1, .1, 0, .1, 1, 0));
+      // image.apply(kanata.mask(maskImage, bgImage));
       // image.apply(kanata.contrastStretch(40, 40, 160, 160));
       // image.apply(kanata.grayLayered(40, 40, 160, 160, [0, 0, 0]));
       // image.apply(kanata.grayscale());
@@ -120,7 +121,8 @@ class Main extends React.Component<any, any> {
 
     this.ctx = ctx;
     this.video = video;
-    vImage.pipe(kanata.contrastStretch(40, 40, 160, 160));
+    // vImage.pipe(kanata.contrastStretch(40, 40, 160, 160));
+    vImage.pipe(kanata.affineTransform(1, .1, 0, .1, 1, 0));
     this.update();
     video.play();
   }

@@ -12,11 +12,10 @@ export function translate (
     background?: TPixel
 ) {
     return geometryBaseOperate(
-        offset,
         background,
-        (attributes: any) => ({
-            offX: ~~attributes[0],
-            offY: ~~attributes[1]
+        () => ({
+            offX: ~~offset[0],
+            offY: ~~offset[1]
         }),
         (newX: number, newY: number, args: any) => ({
             oldX: newX - args.offX,

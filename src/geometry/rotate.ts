@@ -14,13 +14,12 @@ export function rotate (
     background?: TPixel
 ) {
     return geometryBaseOperate(
-        {anchor,angle},
         background,
-        (attributes: any) => ({
-            anchorX: ~~attributes.anchor[0],
-            anchorY: ~~attributes.anchor[1],
-            sina: Math.sin(attributes.angle),
-            cosa: Math.cos(attributes.angle)
+        () => ({
+            anchorX: ~~anchor[0],
+            anchorY: ~~anchor[1],
+            sina: Math.sin(angle),
+            cosa: Math.cos(angle)
         }),
         (newX: number, newY: number, args: any) =>{
             const {anchorX, anchorY, sina, cosa} = args;

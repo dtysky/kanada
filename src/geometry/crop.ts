@@ -12,13 +12,12 @@ export function crop (
     background?: TPixel
 ) {
     return geometryBaseOperate(
-        region,
         background,
-        (attributes: any) => ({
-            left: attributes[0],
-            top: attributes[1],
-            right: attributes[2],
-            bottom: attributes[3]
+        () => ({
+            left: region[0],
+            top: region[1],
+            right: region[2],
+            bottom: region[3]
         }),
         (newX: number, newY: number, args: any) => ({
             oldX: newX > args.right || newX < args.left ? -1 : newX,
