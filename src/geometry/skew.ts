@@ -7,7 +7,7 @@ import {ImageCore} from '../core';
 import {TPosition, TPixel} from '../constants';
 import geometryBaseOperate from './base';
 
-export function shear (
+export function skew (
     factors: TPosition,
     background?: TPixel
 ) {

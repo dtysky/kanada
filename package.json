@@ -1,7 +1,7 @@
 {
   "name": "kanata",
   "version": "0.2.0",
-  "description": "An modern library for image processing on web.",
+  "description": "A modern library for image processing on web with pure typescript.",
   "main": "index.js",
   "scripts": {
     "init-project": "bash ./init.sh",
