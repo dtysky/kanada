@@ -9,7 +9,7 @@ import {TPosition, TPixel} from '../constants';
 export default (
   background: TPixel = [0, 0, 0, 0],
   prepare: () => any,
-  calculate: (newX: number, newY: number, args: any) => {oldX: number, oldY: number}
+  calculate: (newX: number, newY: number, args: any, image?: ImageCore) => {oldX: number, oldY: number}
 ) => (image: ImageCore) => {
     image.modifyData((data, size, region) => {
         const originData = data.slice(0);
@@ -24,7 +24,7 @@ export default (
                     continue;
                 }
                 const newPos = (newY * width + newX) << 2;
-                const {oldX, oldY} = calculate(newX, newY, args);
+                const {oldX, oldY} = calculate(newX, newY, args, image);
                 if (oldX < left || oldX > right || oldY < top || oldY > bottom) {
                     data[newPos] = background[0];
                     if (image.mode !== 'L' && image.mode !== 'B') {

@@ -43,7 +43,7 @@ export const grayLayered = (
             res = channel * k21 + s1;
         }
 
-        return res < 0 ? 0 : res > max ? max : res;
+        return res;
     };
 
     switch (image.mode) {

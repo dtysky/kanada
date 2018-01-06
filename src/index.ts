@@ -8,3 +8,4 @@ export * from './core';
 export * from './geometry';
 export * from './point';
 export * from './utils';
+export * from './localFilter';

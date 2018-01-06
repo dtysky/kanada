@@ -17,6 +17,10 @@ export default class ImageCore {
     private _canvas: HTMLCanvasElement;
     private _context: CanvasRenderingContext2D;
     private _data: ImageData;
+    private _origin: {
+        data: Uint8ClampedArray,
+        mode: TColorSpace
+    };
     private _region: TRegion;
     private _operations: TOperate[];
     // a flag for push back data to context lazily
@@ -25,14 +29,19 @@ export default class ImageCore {
     public dataIsNormalized: boolean;
 
     constructor(
-        mode: TColorSpace = <TColorSpace>'RGBA'
+        mode: TColorSpace = <TColorSpace>'RGBA',
+        canvas?: HTMLCanvasElement
     ) {
         this._mode = mode;
-        this._canvas = document.createElement('canvas');
+        this._canvas = canvas || document.createElement('canvas');
         this._context = this._canvas.getContext('2d');
         this._data = new ImageData(1, 1);
-        this.region = [0, 0, 0, 0];
+        this._origin = {
+            data: new Uint8ClampedArray(this._data.data),
+            mode: mode
+        };
         this._operations = [];
+        this.region = [0, 0, 0, 0];
         this.dataIsModified = false;
         this.dataIsNormalized = true;
     }
@@ -53,6 +62,10 @@ export default class ImageCore {
         return [this._data.width, this._data.height];
     }
 
+    public set data(data: Uint8ClampedArray) {
+        this._data.data.set(data);
+    }
+
     public get data(): TBuffer {
         // to avoid changing private data
         return new Uint8ClampedArray(this._data.data);
@@ -71,6 +84,9 @@ export default class ImageCore {
     }
 
     public set region(region: TRegion) {
+        if (region[2] < region[0] || region[3] < region[1]) {
+            throw new Exceptions.RegionSizeError('right or top', region, 'right >= left and bottom >= top');
+        }
         this._region = region;
         this.normalizeData();
     }
@@ -95,6 +111,8 @@ export default class ImageCore {
         this._context = context;
         this._data = context.getImageData(0, 0, element.width, element.height);
         this.region = [0, 0, canvas.width, canvas.height];
+        this.dataIsModified = false;
+        this.dataIsNormalized = true;
         return this;
     }
 
@@ -117,6 +135,8 @@ export default class ImageCore {
         this._context = context;
         this._mode = mode || this._mode;
         this.region = [0, 0, canvas.width, canvas.height];
+        this.dataIsModified = false;
+        this.dataIsNormalized = true;
         return this;
     }
 
@@ -135,6 +155,8 @@ export default class ImageCore {
         this._data = context.getImageData(0, 0, canvas.width, canvas.height);
         this._mode = 'RGBA';
         this.region = [0, 0, canvas.width, canvas.height];
+        this.dataIsModified = false;
+        this.dataIsNormalized = true;
         return this;
     }
 
@@ -176,13 +198,20 @@ export default class ImageCore {
     public copy(
         image: ImageCore
     ): ImageCore {
-        if (image._mode !== this._mode) {
-            throw new Exceptions.ColorSpaceError('the mode of image', image._mode, this._mode);
-        }
-        this._data = image._data;
-        this._context = image._context;
-        this.dataIsModified = image.dataIsModified;
-        return this;
+        return this.fromBuffer(image.size, image.data, image.mode);
+    }
+
+    public save() {
+        this._origin = {
+            data: new Uint8ClampedArray(this._data.data),
+            mode: this._mode
+        };
+    };
+
+    public restore() {
+        const {data, mode} = this._origin;
+        this._data.data.set(data);
+        this._mode = mode;
     }
 
     public changeMode(
@@ -193,13 +222,13 @@ export default class ImageCore {
     }
 
     public normalizeData() {
-        if (this.normalizeData) {
+        if (this.dataIsNormalized) {
             return;
         }
         if (this._mode === 'L' || this._mode === 'B') {
             const [left, top, right, bottom] = this._region;
             const [width, height] = this.size;
-            this.modifyData((data) => {
+            this.modifyData(data => {
                 for (let y = top; y < bottom; y += 1) {
                     for (let x = left; x < right; x += 1) {
                         const pos = (x + y * width) << 2;
@@ -303,22 +332,27 @@ export default class ImageCore {
 
     public pipe(operate: TOperate) {
         this._operations.push(operate);
+        return this;
     }
 
     public remove(operate: TOperate) {
         this._operations.splice(this._operations.indexOf(operate), 1);
+        return this;
     }
 
     public clear() {
         this._operations = [];
+        return this;
     }
 
     public apply(operate: TOperate) {
         operate(this);
+        return this;
     }
 
     public exec() {
         this._operations.forEach(operate => operate(this));
+        return this;
     }
 
     public map(

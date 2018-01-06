@@ -20,7 +20,7 @@ export const mask = (
     if (allowMode.indexOf(image.mode) < 0) {
         throw new Exceptions.ColorSpaceError('the mode of image to apply mask', image.mode, ...allowMode);
     }
-    const [left, top, right, bottom] = image.region;
+    let [left, top, right, bottom] = image.region;
     const [width, height] = image.size;
     const regionWidth = (right - left);
     const regionHeight = (bottom - top);
@@ -48,6 +48,10 @@ export const mask = (
     image.modifyData(() => {
         for (let y = top; y < bottom; y += 1) {
             for (let x = left; x < right; x += 1) {
+                if (x < 0 || x > width || y < 0 || y > bottom) {
+                    continue;
+                }
+
                 const regionX = x - left;
                 const regionY = y - top;
                 const pos = (x + y * width) << 2;

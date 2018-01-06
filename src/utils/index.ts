@@ -13,3 +13,11 @@ export const changeRegion = (
     image.region = region;
     return image;
 };
+
+export const clone = (
+    image: ImageCore
+) => {
+    const im = new ImageCore();
+    im.copy(image);
+    return im;
+}

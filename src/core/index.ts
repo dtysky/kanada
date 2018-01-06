@@ -6,4 +6,3 @@
 
 export * from './exceptions';
 export {default as ImageCore, TOperate} from './ImageCore';
-export {default as VideoCore} from './VideoCore';

@@ -8,4 +8,5 @@ export * from './translate';
 export * from './rotate';
 export * from './shear';
 export * from './scale';
+export * from './flip';
 export * from './affineTransform';

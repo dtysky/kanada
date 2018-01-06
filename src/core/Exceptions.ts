@@ -4,7 +4,7 @@
  * Description: a set of errors.
  */
 
-import {TColorSpace, TSize} from '../constants';
+import {TColorSpace, TSize, TRegion} from '../constants';
 
 export namespace Exceptions {
     class BaseError extends Error {
@@ -56,11 +56,37 @@ export namespace Exceptions {
         constructor(
             paramName: string,
             currentSize: TSize,
-            expectedSize: TSize
+            expectedSize: TSize | string
         ) {
             super(
                 'ArraySizeError',
                 `Size of array is error, the size of ${paramName} couldn't be '${currentSize}', expect '${expectedSize}'.`
+            );
+        }
+    }
+
+    export class RegionSizeError extends BaseError {
+        constructor(
+            paramName: string,
+            current: TRegion,
+            expect: string
+        ) {
+            super(
+                'RegionSizeError',
+                `Size of region is error, the size of ${paramName} couldn't be '${current}', expect '${expect}'.`
+            );
+        }
+    }
+
+    export class SizeError extends BaseError {
+        constructor(
+            paramName: string,
+            current: number,
+            expect: string
+        ) {
+            super(
+                'SizeError',
+                `Size is error, the size of ${paramName} couldn't be '${current}', expect '${expect}'.`
             );
         }
     }

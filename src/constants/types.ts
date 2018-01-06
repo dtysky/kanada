@@ -72,6 +72,11 @@ export type TPoint = [TPosition, TPixel];
 export type TBuffer = Uint8ClampedArray;
 
 /**
+ * Type of matrix.
+ */
+export type TMatrix = (number[])[];
+
+/**
  * Type of image buffer, it will be an Uint8ClampedArray, like [r1, b1, g1, a1, r2, g2, b2, a2...]
  */
 export type TClipMode =
