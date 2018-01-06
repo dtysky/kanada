@@ -7,7 +7,7 @@
 import {TColorSpace, TSize, TRegion} from '../constants';
 
 export namespace Exceptions {
-    class BaseError extends Error {
+    export class BaseError extends Error {
         constructor(
             name: string = 'BaseError',
             message: string

@@ -3,6 +3,12 @@ A modern library for image processing on web with pure typescript.
 
 >Note: This library is not completed, but some operations are already done.
 
+## Install
+
+```bash
+npm install kanata
+```
+
 ## Usage
 
 ```ts
@@ -65,6 +71,7 @@ image.exec();
 
 ## Features
 
-1. Unit tests.
-2. Benchmarks.
-3. A faster version with webassembly.
+1. Documents
+2. Unit tests.
+3. Benchmarks.
+4. A faster version with webassembly.

@@ -4,6 +4,7 @@
  * Description: Mean filter.
  */
 
+import {ImageCore} from '../core';
 import {convolutionFilter} from './convolutionFilter';
 import {ConvolutionKernel} from './ConvolutionKernel';
 
