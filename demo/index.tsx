@@ -7,15 +7,12 @@ import * as React from 'react';
 import {render} from 'react-dom';
 
 import ImageEx from './ImageEx';
-import VideoEx from './VideoEx';
-import MaskEx from './MaskEx';
 
 class Main extends React.Component<any, any> {
   public render() {
     return (
       <div>
         <ImageEx />
-        <VideoEx />
       </div>
     );
   }

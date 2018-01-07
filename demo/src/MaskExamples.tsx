@@ -5,7 +5,7 @@
  */
 import * as React from 'react';
 import {findDOMNode} from 'react-dom';
-import * as kanata from '../src';
+import * as kanata from '../../src';
 
 let image: kanata.ImageCore;
 const url = '/base/testImages/x.jpg';
@@ -16,7 +16,7 @@ const maskUrl = '/base/testImages/mask.png';
 const bgImage = new kanata.ImageCore();
 const bgUrl = '/base/testImages/bg.jpg';
 
-export default class MaskEx extends React.Component<any, any> {
+export default class MaskExamples extends React.Component<any, any> {
   public center = {
     x: 0,
     y: 0
@@ -31,7 +31,7 @@ export default class MaskEx extends React.Component<any, any> {
       });
     await maskImage.fromURL(maskUrl);
     await bgImage.fromURL(bgUrl);
-    image.pipe(kanata.mask(maskImage, bgImage, true));
+    image.pipe(kanata.mask(maskImage, true, bgImage));
     findDOMNode(this.refs.canvas).addEventListener('mousemove', this.handleMouseMove);
     this.update();
   }

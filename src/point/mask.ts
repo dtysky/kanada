@@ -14,8 +14,8 @@ const defaultFg = (new ImageCore()).fromColor([255, 255, 255, 1]);
 // factor = maskColor / maskMax
 export const mask = (
     maskImage: ImageCore,
-    front: ImageCore = defaultFg,
-    reverse: boolean = false
+    reverse: boolean = false,
+    front: ImageCore = defaultFg
 ) => (image: ImageCore) => {
     if (allowMode.indexOf(image.mode) < 0) {
         throw new Exceptions.ColorSpaceError('the mode of image to apply mask', image.mode, ...allowMode);

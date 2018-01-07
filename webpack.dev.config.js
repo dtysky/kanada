@@ -9,7 +9,7 @@ const path = require('path');
 module.exports = {
   entry: [
     'webpack-hot-middleware/client?path=http://localhost:4444/__webpack_hmr&reload=true',
-    path.resolve(__dirname, './demo/index.tsx')
+    path.resolve(__dirname, './demo/src/index.tsx')
   ],
   output: {
     path: path.resolve(__dirname),
@@ -64,6 +64,23 @@ module.exports = {
             emccFlags: ['-O3']
           }
         }
+      },
+      {
+        test: /\.(css|scss)$/,
+        use: [
+          {
+            loader: 'style-loader'
+          },
+          {
+            loader: 'css-loader'
+          },
+          {
+            loader: 'postcss-loader'
+          },
+          {
+            loader: 'sass-loader'
+          }
+        ]
       },
       {
         test: /\.(png|jpg|gif|svg|mp4)$/,

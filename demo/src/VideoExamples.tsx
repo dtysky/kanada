@@ -5,12 +5,12 @@
  */
 import * as React from 'react';
 import {findDOMNode} from 'react-dom';
-import * as kanata from '../src';
+import * as kanata from '../../src';
 
 const vImage = new kanata.ImageCore();
 const vUrl = '/base/testImages/x.mp4';
 
-export default class VideoEx extends React.Component<any, any> {
+export default class VideoExamples extends React.Component<any, any> {
   private video: HTMLVideoElement;
   private ctx: CanvasRenderingContext2D;
 

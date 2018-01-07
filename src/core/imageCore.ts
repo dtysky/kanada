@@ -87,12 +87,13 @@ export default class ImageCore {
         if (region[2] < region[0] || region[3] < region[1]) {
             throw new Exceptions.RegionSizeError('right or top', region, 'right >= left and bottom >= top');
         }
-        this._region = region;
+        this._region = [region[0], region[1], region[2], region[3]];
         this.normalizeData();
     }
 
     public get region(): TRegion {
-        return this._region;
+        const region = this._region;
+        return [region[0], region[1], region[2], region[3]];
     }
 
     public fromElement(

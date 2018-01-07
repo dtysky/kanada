@@ -29,11 +29,11 @@ const wasmColorInvert = Module._colorInvert;
 declare const FILTER: any;
 const canvas = document.createElement('canvas');
 
-import * as GPU from 'gpu.js';
-const gpu = new GPU();
-const gpuColorInvert = gpu.createKernel(function(data) {
-  return 255 - data[this.thread.x];
-});
+// import * as GPU from 'gpu.js';
+// const gpu = new GPU();
+// const gpuColorInvert = gpu.createKernel(function(data) {
+//   return 255 - data[this.thread.x];
+// });
 
 export default class ImageEx extends React.Component<any, any> {
   public state = {
