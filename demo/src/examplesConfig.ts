@@ -17,9 +17,9 @@ type TMeta = {
     }
 };
 
-export const defaultImage = '/base/testImages/x.jpg';
-export const defaultMask = '/base/testImages/mask.png';
-export const defaultFg = '/base/testImages/fg.jpg';
+export const defaultImage = '/static/image.jpg';
+export const defaultMask = '/static/mask.png';
+export const defaultFg = '/static/fg.jpg';
 
 export const metaTable: TMeta = {
     grayscale: {
@@ -92,7 +92,7 @@ export const metaTable: TMeta = {
         args: [
             ['maskImage', 'image', defaultMask],
             ['reverse', 'boolean', false],
-            ['front', 'image', undefined]
+            ['front', 'image', defaultFg]
         ]
     }
 };

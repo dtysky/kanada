@@ -11,10 +11,10 @@ const allowMode: TColorSpace[] = ['RGBA', 'RGB', 'BGR', 'BGRA', 'L'];
 
 function checkSize(
     color: TChannel[],
-    expectSize: TSize
+    expectSize: TSize[]
 ): void {
-    if (color.length !== expectSize) {
-        throw new Exceptions.ArraySizeError('GrayLayered color', color.length, expectSize);
+    if (expectSize.indexOf(color.length) < 0) {
+        throw new Exceptions.ArraySizeError('GrayLayered color', color.length, expectSize.join(', '));
     }
 }
 
@@ -51,7 +51,7 @@ export const grayLayered = (
         case 'RGBA':
         case 'BGR':
         case 'BGRA': {
-            checkSize(color, 3);
+            checkSize(color, [3]);
             image.modifyData(data => {
                 for (let y = top; y < bottom; y += 1) {
                     for (let x = left; x < right; x += 1) {
@@ -65,7 +65,7 @@ export const grayLayered = (
             break;
         }
         case 'L': {
-            checkSize(color, 1);
+            checkSize(color, [1, 3]);
             image.modifyData(data => {
                 for (let y = top; y < bottom; y += 1) {
                     for (let x = left; x < right; x += 1) {

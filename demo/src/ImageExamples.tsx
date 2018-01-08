@@ -58,20 +58,7 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
       name: 'grayscale',
       operation: kanata.grayscale(),
       args: []
-    },
-    {
-      name: 'globalThreshold',
-      operation: kanata.globalThreshold(100, 160),
-      args: [
-        {name: 'th', value: 100, type: 'number'},
-        {name: 'th2', value: 160, type: 'number'}
-      ]
-    },
-    // {
-    //   name: 'colorInvert',
-    //   operation: kanata.colorInvert(),
-    //   args: []
-    // }
+    }
   ];
 
   public componentDidMount() {
@@ -87,6 +74,18 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
       });
   }
 
+  private triggerError(error: Error) {
+    this.setState({
+      notification: {
+        type: 'error',
+        content: error.message,
+        showClose: true,
+        duration: 4
+      }
+    });
+    console.error(error);
+  }
+
   private handleSubmitURL = async (event, value: string) => {
     if (value === this.state.url) {
       return;
@@ -100,14 +99,7 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
         region: [100, 100, width - 100, height - 100]
       });
     } catch (error) {
-      this.setState({
-        notification: {
-          type: 'error',
-          content: error.message,
-          showClose: true,
-          duration: 4
-        }
-      });
+      this.triggerError(error);
     }
   }
 
@@ -157,14 +149,7 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
             await nImage.fromURL(value);
             return nImage;
           } catch (error) {
-            this.setState({
-              notification: {
-                type: 'error',
-                content: error.message,
-                showClose: true,
-                duration: 4
-              }
-            });
+            this.triggerError(error);
           }
         }
         case 'ck':
@@ -194,20 +179,24 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
     
     const s = performance.now();
     // exec
-    image.exec();
-    const duration = performance.now() - s;
-    console.log('Performance', duration);
-
-    image.pushDataBackToContext();
-    this.setState({
-      src: image.dataURL,
-      notification: {
-        type: 'success',
-        content: `Processing done, duration: ${duration.toFixed(2)} ms`,
-        showClose: true,
-        duration: 3
-      }
-    });
+    try {
+      image.exec();
+      const duration = performance.now() - s;
+      console.log('Performance', duration);
+  
+      image.pushDataBackToContext();
+      this.setState({
+        src: image.dataURL,
+        notification: {
+          type: 'success',
+          content: `Processing done, duration: ${duration.toFixed(2)} ms`,
+          showClose: true,
+          duration: 3
+        }
+      });
+    } catch (error) {
+      this.triggerError(error);
+    }
   }
     
   public render() {
@@ -216,7 +205,6 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
         {this.renderImage()}
         {this.renderBase()}
         {this.renderOperations()}
-        {this.renderMeta()}
         <Notifications
           notification={this.state.notification}
           onRequestClose={() => this.setState({notification: {}})}
@@ -250,31 +238,45 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
         expand
         open
       >
-        <Form>
-          <FormItem label={'Image url:'}>
-            <Text
-              withIcon={false}
-              type={'string'}
-              defaultValue={defaultImage}
-              auto
-              onBlur={this.handleSubmitURL}
-            />
-          </FormItem>
-          <FormGroup label={'Region:'} labelPosition={'left'}>
-            {
-              ['Left', 'Top', 'Right', 'Bottom'].map((label, index) => (
-                <FormItem key={label} label={`${label}:`}>
-                  <Text
-                    value={region[index]}
-                    withIcon={false}
-                    type={'int'}
-                    onChange={(e, v) => this.handleChangeRegion(index, v)}
-                  />
-                </FormItem>
-              ))
-            }
-          </FormGroup>
-        </Form>
+        <div style={{display: 'flex', alignItems: 'center'}}>
+          <Button
+            type={'primary'}
+            onClick={this.handleRun}
+            size={'large'}
+            style={{
+              display: 'block',
+              height: 100,
+              width: 100
+            }}
+          >
+            Run !
+          </Button>
+          <Form>
+            <FormItem label={'Image url:'} labelStyle={{width: 84}}>
+              <Text
+                withIcon={false}
+                type={'string'}
+                defaultValue={defaultImage}
+                auto
+                onBlur={this.handleSubmitURL}
+              />
+            </FormItem>
+            <FormGroup label={'Region:'} labelPosition={'left'} labelStyle={{width: 84}}>
+              {
+                ['Left', 'Top', 'Right', 'Bottom'].map((label, index) => (
+                  <FormItem key={label} label={`${label}:`}>
+                    <Text
+                      value={region[index]}
+                      withIcon={false}
+                      type={'int'}
+                      onChange={(e, v) => this.handleChangeRegion(index, v)}
+                    />
+                  </FormItem>
+                ))
+              }
+            </FormGroup>
+          </Form>
+        </div>
       </Card>
     );
   }
@@ -289,31 +291,27 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
         expand
         open
       >
-        <Button
-          type={'primary'}
-          icon={'himawari'}
-          onClick={this.handleRun}
-        >
-          Run !
-        </Button>
-        <Button
-          onClick={this.handleAddOperation}
-          style={{marginLeft: 36, marginRight: 12}}
-          icon={'plus'}
-        >
-          Add a operation
-        </Button>
-        <Select
-          onSelect={value => this.setState({operation: value})}
-          value={operation}
-          style={{width: 240}}
-        >
-          {
-            metaTableKeys.map(key => (
-              <Option key={key} label={key} value={key} />
-            ))
-          }
-        </Select>
+        <div style={{marginBottom: 24}}>
+          <Button
+            onClick={this.handleAddOperation}
+            style={{marginRight: 12}}
+            icon={'plus'}
+          >
+            Add a operation
+          </Button>
+          <Select
+            onSelect={value => this.setState({operation: value})}
+            value={operation}
+            style={{width: 240}}
+          >
+            {
+              metaTableKeys.map(key => (
+                <Option key={key} label={key} value={key} />
+              ))
+            }
+          </Select>
+        </div>
+        {this.renderMeta()}
       </Card>
     );
   }
@@ -330,19 +328,13 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
     const {name, args} = item;
 
     return (
-      <Card
-        key={index} title={`${index} - ${name}`}
-        expand
-        open
-      >
+      <Postcard key={index} title={`${index} - ${name}`} style={{marginBottom: 12}}>
         <Form>
-          <FormGroup labelPosition={'left'}>
-              {
-                args.map(arg => (
-                  <FormItem key={arg.name} label={arg.name}>{this.renderMetaArg(arg)}</FormItem>
-                ))
-              }
-            </FormGroup>
+          {
+            args.map(arg => (
+              <FormItem key={arg.name} label={arg.name} labelStyle={{width: 100}}>{this.renderMetaArg(arg)}</FormItem>
+            ))
+          }
         </Form>
         <Button
           type={'primary'}
@@ -357,7 +349,7 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
         >
           Delete
         </Button>
-      </Card>
+      </Postcard>
     );
   }
 
@@ -392,7 +384,7 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
           <Text
             withIcon={false}
             type={'string'}
-            auto
+            value={value}
             onBlur={(event, val) => {
               arg.value = val;
               this.forceUpdate();
@@ -440,7 +432,7 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
           </div>
         );
       case 'pixel':
-      return (
+        return (
           <div>
             <Text
               icon={'r'}

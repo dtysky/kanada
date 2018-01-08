@@ -35,8 +35,6 @@ export const gammaTransform = (
     times: number[] | number,
     gammas: number[] | number
 ) => (image: ImageCore) => {
-    times = typeof times === 'number' ? [times, times, times] : times;
-    gammas = typeof gammas === 'number' ? [gammas, gammas, gammas] : gammas;
     const [left, top, right, bottom] = image.region;
     const [width, height] = image.size;
     switch (image.mode) {
@@ -46,7 +44,10 @@ export const gammaTransform = (
         case 'BGRA':
         case 'HSL':
         case 'HSV': {
+            times = typeof times === 'number' ? [times, times, times] : times;
+            gammas = typeof gammas === 'number' ? [gammas, gammas, gammas] : gammas;
             checkSize(times, 3);
+            checkSize(gammas, 3);
             const [max1, max2, max3] = COLOR_MAX[image.mode];
             const [t1, t2, t3] = times;
             const [g1, g2, g3] = gammas;
@@ -67,7 +68,10 @@ export const gammaTransform = (
         }
         case 'L':
         case 'B': {
+            times = typeof times === 'number' ? [times] : times;
+            gammas = typeof gammas === 'number' ? [gammas] : gammas;
             checkSize(times, 1);
+            checkSize(gammas, 1);
             const [max1] = COLOR_MAX[image.mode];
             const [t1] = times;
             const [g1] = gammas;
@@ -83,7 +87,10 @@ export const gammaTransform = (
             break;
         }
         case 'CMYK': {
+            times = typeof times === 'number' ? [times, times, times, times] : times;
+            gammas = typeof gammas === 'number' ? [gammas, gammas, gammas, gammas] : gammas;
             checkSize(times, 4);
+            checkSize(gammas, 4);
             const [max1, max2, max3, max4] = COLOR_MAX[image.mode];
             const [t1, t2, t3, t4] = times;
             const [g1, g2, g3, g4] = gammas;

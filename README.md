@@ -3,6 +3,10 @@ A modern library for image processing on web with pure typescript.
 
 >Note: This library is not completed, but some operations are already done.
 
+## Demo
+
+[You can check the live demo here.](http://kanata.dtysky.moe)
+
 ## Install
 
 ```bash

@@ -4,13 +4,21 @@
  * Description: linear transformation for each channel of pixels.
  */
 
-import {ImageCore} from '../core';
-import {COLOR_MAX, TChannel} from '../constants';
+import {ImageCore, Exceptions} from '../core';
+import {COLOR_MAX, TChannel, TSize} from '../constants';
+
+function checkSize(
+    times: number[],
+    expectSize: TSize
+): void {
+    if (times.length !== expectSize) {
+        throw new Exceptions.ArraySizeError('LinearTransform times', times.length, expectSize);
+    }
+}
 
 export const linearTransform = (
     gains: number[] | number
 ) => (image: ImageCore) => {
-    gains = typeof gains === 'number' ? [gains, gains, gains] : gains;
     const size = image.data.length;
     switch (image.mode) {
         case 'RGB':
@@ -19,6 +27,8 @@ export const linearTransform = (
         case 'BGRA':
         case 'HSL':
         case 'HSV': {
+            gains = typeof gains === 'number' ? [gains, gains, gains] : gains;
+            checkSize(gains, 3);
             const [max1, max2, max3] = COLOR_MAX[image.mode];
             const [gain1, gain2, gain3] = gains;
             const border1 = max1 - gain1;
@@ -35,6 +45,8 @@ export const linearTransform = (
         }
         case 'L':
         case 'B': {
+            gains = typeof gains === 'number' ? [gains] : gains;
+            checkSize(gains, 1);
             const [max1] = COLOR_MAX[image.mode];
             const [gain1] = gains;
             const border1 = max1 - gain1;
@@ -46,6 +58,8 @@ export const linearTransform = (
             break;
         }
         case 'CMYK': {
+            gains = typeof gains === 'number' ? [gains, gains, gains, gains] : gains;
+            checkSize(gains, 4);
             const [max1, max2, max3, max4] = COLOR_MAX[image.mode];
             const [gain1, gain2, gain3, gain4] = gains;
             const border1 = max1 - gain1;

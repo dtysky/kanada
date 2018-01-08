@@ -32,7 +32,6 @@ function getBorder(
 export const logTransform = (
     times: number[] | number
 ) => (image: ImageCore) => {
-    times = typeof times === 'number' ? [times, times, times] : times;
     const size = image.data.length;
     switch (image.mode) {
         case 'RGB':
@@ -41,6 +40,7 @@ export const logTransform = (
         case 'BGRA':
         case 'HSL':
         case 'HSV': {
+            times = typeof times === 'number' ? [times, times, times] : times;
             checkSize(times, 3);
             const [max1, max2, max3] = COLOR_MAX[image.mode];
             const [t1, t2, t3] = times;
@@ -58,6 +58,7 @@ export const logTransform = (
         }
         case 'L':
         case 'B': {
+            times = typeof times === 'number' ? [times] : times;
             checkSize(times, 1);
             const [max1] = COLOR_MAX[image.mode];
             const [t1] = times;
@@ -70,6 +71,7 @@ export const logTransform = (
             break;
         }
         case 'CMYK': {
+            times = typeof times === 'number' ? [times, times, times, times] : times;
             checkSize(times, 4);
             const [max1, max2, max3, max4] = COLOR_MAX[image.mode];
             const [t1, t2, t3, t4] = times;
