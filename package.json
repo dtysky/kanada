@@ -1,6 +1,6 @@
 {
   "name": "kanata",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A modern library for image processing on web with pure typescript.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

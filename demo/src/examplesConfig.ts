@@ -175,7 +175,7 @@ export const metaTable: TMeta = {
     localThreshold: {
         operation: kanata.localThreshold,
         args: [
-            ['thMap', 'image', '']
+            ['preOperations', ['meanFilter3', 'rankFilter3', 'meanFilter7', 'rankFilter7'], 'meanFilter3']
         ]
     }
 };

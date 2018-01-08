@@ -165,6 +165,19 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
             this.triggerError(error);
           }
         default:
+          if (operation.name === 'localThreshold') {
+            switch (value) {
+              case 'meanFilter3':
+                return [kanata.meanFilter(3)];
+              case 'meanFilter5':
+                return [kanata.meanFilter(7)];
+              case 'rankFilter3':
+                return [kanata.rankFilter(3, 4)];
+              case 'rankFilter5':
+              default:
+                return [kanata.rankFilter(7, 24)];
+            }
+          }
           return value;
       }
     });
