@@ -14,7 +14,13 @@ export class ConvolutionKernel {
     constructor(matrix: TMatrix) {
         const size = matrix.length;
         this._matrix = [];
+        if (!(matrix instanceof Array)) {
+            throw new Exceptions.TypeError('Type of matrix', JSON.stringify(matrix), 'Array');
+        }
         matrix.forEach((m: number[]) => {
+            if (!(m instanceof Array)) {
+                throw new Exceptions.TypeError('Type of children of matrix', JSON.stringify(m), 'Array');
+            }
             if (m.length !== size) {
                 throw new Exceptions.ArraySizeError('Size of children of matrix', matrix.length, `same as matrix: ${size}`);
             }

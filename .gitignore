@@ -14,3 +14,4 @@ Cargo.lock
 Cargo.lock
 demo/main.*
 demo/vendor.js
+lib

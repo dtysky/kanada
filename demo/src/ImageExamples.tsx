@@ -7,6 +7,7 @@ import * as React from 'react';
 import {Button, ButtonGroup} from 'hana-ui/dist/seeds/Button';
 import {Image} from 'hana-ui/dist/seeds/Image';
 import * as Text from 'hana-ui/dist/seeds/Text';
+import * as TextArea from 'hana-ui/dist/seeds/TextArea';
 import {Form, FormItem, FormGroup} from 'hana-ui/dist/burgeon/Form';
 import {Select, Option} from 'hana-ui/dist/seeds/Select';
 import * as Switch from 'hana-ui/dist/seeds/Switch';
@@ -19,7 +20,7 @@ import {defaultImage, metaTable, metaTableKeys} from './examplesConfig';
 
 type TMetaArg = {
   name: string,
-  type: 'number' | 'ck' | 'image' | 'colorSpace' | 'position' | 'pixel' | 'boolean',
+  type: 'number' | 'ck' | 'image' | 'colorSpace' | 'position' | 'pixel' | 'boolean' | string[] | 'region',
   value: any
 };
 
@@ -41,7 +42,8 @@ interface IStateTypes {
     showClose?: boolean,
     duration?: number
   },
-  operation: string
+  operation: string,
+  adding: boolean
 }
 
 export default class ImageExamples extends React.Component<any, IStateTypes> {
@@ -50,7 +52,8 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
     src: '',
     region: [0, 0, 0, 0],
     notification: {},
-    operation: metaTableKeys[0]
+    operation: metaTableKeys[0],
+    adding: false
   };
 
   private metaItems: TMetaItem[] = [
@@ -70,6 +73,8 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
           this.setState({
             src: image.dataURL,
             region: [100, 100, width - 100, height - 100]
+          }, () => {
+            this.handleRun();
           });
       });
   }
@@ -128,14 +133,15 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
       }))
     });
 
-    this.forceUpdate();
+    this.handleModifyOperation(this.metaItems.length - 1);
   }
 
   private handleModifyOperation = (index: number) => {
     const operation = this.metaItems[index];
     const metaOperation = metaTable[operation.name].operation;
+    this.setState({adding: true});
 
-    const args = operation.args.map(async ({name, type, value}) => {
+    const argsPromise = operation.args.map(async ({name, type, value}) => {
       switch (type) {
         case 'number':
         case 'boolean':
@@ -153,12 +159,28 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
           }
         }
         case 'ck':
+          try {
+            return new kanata.ConvolutionKernel(JSON.parse(value));
+          } catch (error) {
+            this.triggerError(error);
+          }
         default:
-          return;
+          return value;
       }
     });
 
-    operation.operation = metaOperation(...args);
+    Promise.all(argsPromise).then(args => {
+      operation.operation = metaOperation(...args);
+      this.setState({
+        adding: false,
+        notification: {
+          type: 'success',
+          content: 'Modify done.',
+          showClose: true,
+          duration: 2
+        }
+      });
+    });
   }
 
   private handleDeleteOperation = (index: number) => {
@@ -176,14 +198,14 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
 
     // set region
     image.region = this.state.region;
-    
+
     const s = performance.now();
     // exec
     try {
       image.exec();
       const duration = performance.now() - s;
       console.log('Performance', duration);
-  
+
       image.pushDataBackToContext();
       this.setState({
         src: image.dataURL,
@@ -282,7 +304,7 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
   }
 
   private renderOperations() {
-    const {region, operation} = this.state;
+    const {region, operation, adding} = this.state;
 
     return (
       <Card
@@ -296,6 +318,7 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
             onClick={this.handleAddOperation}
             style={{marginRight: 12}}
             icon={'plus'}
+            disabled={adding}
           >
             Add a operation
           </Button>
@@ -340,12 +363,14 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
           type={'primary'}
           onClick={() => this.handleModifyOperation(index)}
           style={{marginRight: 12}}
+          disabled={this.state.adding}
         >
           Confirm modification
         </Button>
         <Button
           type={'error'}
           onClick={() => this.handleDeleteOperation(index)}
+          disabled={this.state.adding}
         >
           Delete
         </Button>
@@ -361,8 +386,9 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
         return (
           <Text
             withIcon={false}
-            type={'int'}
-            value={value}
+            type={'float'}
+            auto
+            defaultValue={arg.value}
             onChange={(event, val) => {
               arg.value = val;
               this.forceUpdate();
@@ -384,7 +410,8 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
           <Text
             withIcon={false}
             type={'string'}
-            value={value}
+            auto
+            defaultValue={arg.value}
             onBlur={(event, val) => {
               arg.value = val;
               this.forceUpdate();
@@ -410,11 +437,12 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
         );
       case 'position':
         return (
-          <div>
+          <div style={{display: 'flex'}}>
             <Text
               icon={'x'}
-              type={'int'}
+              type={'float'}
               auto
+              defaultValue={arg.value[0]}
               onBlur={(event, val) => {
                 arg.value[0] = val;
                 this.forceUpdate();
@@ -422,8 +450,9 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
             />
             <Text
               icon={'y'}
-              type={'int'}
+              type={'float'}
               auto
+              defaultValue={arg.value[1]}
               onBlur={(event, val) => {
                 arg.value[1] = val;
                 this.forceUpdate();
@@ -433,11 +462,12 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
         );
       case 'pixel':
         return (
-          <div>
+          <div style={{display: 'flex'}}>
             <Text
               icon={'r'}
               type={'int'}
               auto
+              defaultValue={arg.value[0]}
               onBlur={(event, val) => {
                 arg.value[0] = val;
                 this.forceUpdate();
@@ -447,6 +477,7 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
               icon={'g'}
               type={'int'}
               auto
+              defaultValue={arg.value[1]}
               onBlur={(event, val) => {
                 arg.value[1] = val;
                 this.forceUpdate();
@@ -456,6 +487,7 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
               icon={'b'}
               type={'int'}
               auto
+              defaultValue={arg.value[2]}
               onBlur={(event, val) => {
                 arg.value[2] = val;
                 this.forceUpdate();
@@ -465,6 +497,53 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
               icon={'a'}
               type={'int'}
               auto
+              defaultValue={arg.value[3]}
+              onBlur={(event, val) => {
+                arg.value[3] = val;
+                this.forceUpdate();
+              }}
+            />
+          </div>
+        );
+      case 'region':
+      // enum
+        return (
+          <div style={{display: 'flex'}}>
+            <Text
+              icon={'l'}
+              type={'int'}
+              auto
+              defaultValue={arg.value[0]}
+              onBlur={(event, val) => {
+                arg.value[0] = val;
+                this.forceUpdate();
+              }}
+            />
+            <Text
+              icon={'t'}
+              type={'int'}
+              auto
+              defaultValue={arg.value[1]}
+              onBlur={(event, val) => {
+                arg.value[1] = val;
+                this.forceUpdate();
+              }}
+            />
+            <Text
+              icon={'r'}
+              type={'int'}
+              auto
+              defaultValue={arg.value[2]}
+              onBlur={(event, val) => {
+                arg.value[2] = val;
+                this.forceUpdate();
+              }}
+            />
+            <Text
+              icon={'b'}
+              type={'int'}
+              auto
+              defaultValue={arg.value[3]}
               onBlur={(event, val) => {
                 arg.value[3] = val;
                 this.forceUpdate();
@@ -473,7 +552,35 @@ export default class ImageExamples extends React.Component<any, IStateTypes> {
           </div>
         );
       case 'ck':
+        return (
+          <TextArea
+            withIcon={false}
+            type={'string'}
+            auto
+            defaultValue={arg.value}
+            onBlur={(event, val) => {
+              arg.value = val;
+              this.forceUpdate();
+            }}
+          />
+        );
       default:
+        return (
+          <Select
+            onSelect={val => {
+              arg.value = val;
+              this.forceUpdate();
+            }}
+            value={value}
+            style={{width: 240}}
+          >
+            {
+              type.map(key => (
+                <Option key={key} label={key} value={key} />
+              ))
+            }
+          </Select>
+        );
     }
   }
 }

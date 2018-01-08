@@ -90,4 +90,17 @@ export namespace Exceptions {
             );
         }
     }
+
+    export class TypeError extends BaseError {
+        constructor(
+            paramName: string,
+            current: string,
+            expect: string
+        ) {
+            super(
+                'TyprError',
+                `Type is error, the size of ${paramName} couldn't be '${current}', expect '${expect}'.`
+            );
+        }
+    }
 }
