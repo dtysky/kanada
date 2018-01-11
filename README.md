@@ -75,7 +75,9 @@ image.exec();
 
 ## Features
 
-1. Documents
-2. Unit tests.
-3. Benchmarks.
-4. A faster version with webassembly.
+1. More operations.
+2. Worker.
+3. Documents
+4. Unit tests.
+5. Benchmarks.
+6. A faster version with webassembly.
